@@ -52,7 +52,7 @@
 \title{Tree Power Notes}
 
 
-\author{author\thanks{University of Washington, Tacoma, WA} %\and author\thanks{institue2} 
+\author{author\thanks{University of Washington, WA} %\and author\thanks{institue2} 
 \and author\footnotemark[1]}
 
 \begin{document}
@@ -72,7 +72,7 @@
 
 \section{Assumptions}
 
-With these assumptions, the DE problem reduces to 1D.
+%With these assumptions, the DE problem reduces to 1D.
 \begin{enumerate}
 \item We assume all trees we consider are roughly the same. That means same height, same radius
 \item With the previous assumption, we place all devices at the same height, and same depth
@@ -85,8 +85,8 @@ Our goal is to write Python scripts that would simulate the temperature distribu
 \item Ambient temperature: see [\ref{airtempforest}] and [\ref{evergreen}]
 \end{enumerate}
 
-\subsection{FD model of temperature within a tree stem}
-
+\section{PDE model of temperature within a tree stem}
+\subsection{Parameters\textcolor{red}{to collect and verify. Nick}}
 Notations: 
 \begin{enumerate}
 \item $T$: temperature (K)
@@ -99,6 +99,7 @@ Notations:
 \item $\alpha$: albedo of the surface
 \end{enumerate}
 
+\subsection{The heat equation in cylindircal coordinates}
 The basic heat equation for temperature distribution is 
 \begin{equation}
 \rho c\frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\frac{1}{r}\frac{\partial}{\partial \phi}\bigg(\frac{k}{r}\frac{\partial T}{\partial \phi}\bigg)
@@ -130,92 +131,92 @@ more details in \ref{heat}.
 
 Our goal now is to solve this 2D differential equation with FD scheme.
 
-\textcolor{red}{ref, see section 3.6: https://link.springer.com/content/pdf/10.1007\%2F978-3-319-55456-3.pdf} and
+
 
 \textcolor{red}{https://pycav.readthedocs.io/en/latest/api/pde/crank\_nicolson.html}
 
-\subsection{FD model of temperature in the forest}
+\subsection{FD scheme for the heat equation}
 
-To do.
+A detailed discussion about polar heat equation is in [\ref{2017book}]. However, the equation presented there was axi-symmetric, and our equation depends on the azimuth angle $\phi$. Our goal is to modify the equation, therefore method presented. \textcolor{red}{pg.251, section 3.5.6}
 
+\subsection{Implementation in Python and numerical results}
+%\newpage
 
-\newpage
+%\section{To do (Jan 31)}
+%\begin{enumerate}
+%\item (DISCUSSION ITEM) Understand the hardware more: which equations to use, heat? thermoelectric? both? \textcolor{blue}{DONE. use heat equation. Goal is to model the temp in the tree and in the environment. At a same height. see\ref{sapwood}.}
 
-\section{To do (Jan 31)}
-\begin{enumerate}
-\item (DISCUSSION ITEM) Understand the hardware more: which equations to use, heat? thermoelectric? both? \textcolor{blue}{DONE. use heat equation. Goal is to model the temp in the tree and in the environment. At a same height. see\ref{sapwood}.}
+%\item (ACTION ITEM) Write code (Matlab/Python) to solve equations (equations see next section). \textcolor{red}{ref: http://www.claudiobellei.com/2016/11/10/crank-nicolson/}
 
-\item (ACTION ITEM) Write code (Matlab/Python) to solve equations (equations see next section). \textcolor{red}{ref: http://www.claudiobellei.com/2016/11/10/crank-nicolson/}
+%\textcolor{red}{http://www.claudiobellei.com/2016/10/15/explicit-parabolic/}
 
-\textcolor{red}{http://www.claudiobellei.com/2016/10/15/explicit-parabolic/}
+%\textcolor{blue}{1D code. Keep code in github repo: https://github.com/yajuna/treeRemote}
 
-\textcolor{blue}{1D code. Keep code in github repo: https://github.com/yajuna/treeRemote}
+%\item Verify the assumptions. 
+%\begin{enumerate}
+%\item With vertical drilling and data collection, find the best height. Call $h_0$\textcolor{blue}{see \ref{sapwood}}
+%\item With horizontal drilling and data collection, find the best depth. Call $r_0$
+%\end{enumerate}
 
-\item Verify the assumptions. 
-\begin{enumerate}
-\item With vertical drilling and data collection, find the best height. Call $h_0$\textcolor{blue}{see \ref{sapwood}}
-\item With horizontal drilling and data collection, find the best depth. Call $r_0$
-\end{enumerate}
-
-With the assumption that we have found the ``best" height and radius (best: highest voltage, most activities, depending on the device??), we simplify the problem into a 1D problem. 
-
-
-\item Find appropriate parameters in DE. For now, we take simple ones. \textcolor{red}{ISSUE: if real parameters are small or have varying magnitudes, might cause unexpected numerical errors}\textcolor{blue}{Waiting for confirmation from Nick.}
+%With the assumption that we have found the ``best" height and radius (best: highest voltage, most activities, depending on the device??), we simplify the problem into a 1D problem. 
 
 
-\end{enumerate}
+%\item Find appropriate parameters in DE. For now, we take simple ones. \textcolor{red}{ISSUE: if real parameters are small or have varying magnitudes, might cause unexpected numerical errors}\textcolor{blue}{Waiting for confirmation from Nick.}
 
-\section{Differential Equations}
 
-\begin{tikzpicture}
-\def\angle{60}%
-\pgfmathsetlengthmacro{\xoff}{2cm*cos(\angle)}%
-\pgfmathsetlengthmacro{\yoff}{1cm*sin(\angle)}%
-\draw [thick, fill=gray!10] (\xoff,-\yoff) circle[x radius=8cm, y radius=4cm] ++(3*\xoff,-3*\yoff) node{Heat Source};
-\draw [thick, fill=gray!50] (0.5*\xoff,-0.5*\yoff) circle[x radius=5cm, y radius=2.5cm] ++(1.5*\xoff,-1.5*\yoff) node{Thermoelectric Region};
-\draw [thick, fill=gray!80] (0,0) circle[x radius=2cm, y radius=1cm] node{Heat Sink};
-\end{tikzpicture}
+%\end{enumerate}
 
-%ref for tikz: https://tex.stackexchange.com/questions/495446/drawing-concentric-ellipses-with-text-with-tikz
+%\section{Differential Equations}
 
-We modify the equations from [\ref{thermoelectric}], to radial equations.
-Heat source and thermoelectric material in Fig.2[\ref{thermoelectric}] is now along the radius $r$. (\textcolor{red}{ASK ABOUT HARDWARE. Fig.1, and Fig.2. from ref})
+%\begin{tikzpicture}
+%\def\angle{60}%
+%\pgfmathsetlengthmacro{\xoff}{2cm*cos(\angle)}%
+%\pgfmathsetlengthmacro{\yoff}{1cm*sin(\angle)}%
+%\draw [thick, fill=gray!10] (\xoff,-\yoff) circle[x radius=8cm, y radius=4cm] ++(3*\xoff,-3*\yoff) node{Heat Source};
+%\draw [thick, fill=gray!50] (0.5*\xoff,-0.5*\yoff) circle[x radius=5cm, y radius=2.5cm] ++(1.5*\xoff,-1.5*\yoff) node{Thermoelectric Region};
+%\draw [thick, fill=gray!80] (0,0) circle[x radius=2cm, y radius=1cm] node{Heat Sink};
+%\end{tikzpicture}
 
-Heat sink and resource for region $R$ are governed by the heat equation
-\begin{equation}
-\rho_R\ C_{vR}\ \frac{\partial T}{\partial t}=\nabla\cdot (k_R\nabla T),\label{heat}
-\end{equation}
+%%ref for tikz: https://tex.stackexchange.com/questions/495446/drawing-concentric-ellipses-with-text-with-tikz
 
-here, $T$ is the temperature, $t$ time, $\rho_R$ the density for region $R$, $C_{vR}$ specific heat, $k_R$ is the thermal conductivity. 
+%We modify the equations from [\ref{thermoelectric}], to radial equations.
+%Heat source and thermoelectric material in Fig.2[\ref{thermoelectric}] is now along the radius $r$. (\textcolor{red}{ASK ABOUT HARDWARE. Fig.1, and Fig.2. from ref})
 
-The middle layer is the thermoelectric region, governed by 
-\begin{align}
-\rho_{m}\ C_{vm}\ \frac{\partial T}{\partial t}&=\sigma\bE\cdot\bE-\sigma\cdot \alpha\bE\cdot \nabla T+\nabla\cdot[(k_m+\sigma\alpha^2T)\nabla T-\sigma\alpha T\bE],\label{elec}\\
-\frac{\partial \rho}{\partial t}&=\nabla\cdot (-\sigma\bE+\sigma\alpha\nabla T).\label{chargedensity}
-\end{align}
-Here $\bE$ is the electric field, $\rho$ the charge density, $\sigma$ the electric conductivity, and $\alpha$ the Seebeck coefficient (\textcolor{red}{with temp dependence $\alpha=\alpha(T)$. Need curve fitting to decide}). 
+%Heat sink and resource for region $R$ are governed by the heat equation
+%\begin{equation}
+%\rho_R\ C_{vR}\ \frac{\partial T}{\partial t}=\nabla\cdot (k_R\nabla T),\label{heat}
+%\end{equation}
 
-\textcolor{red}{DO NOT KNOW ANY PARAMETERS}
+%here, $T$ is the temperature, $t$ time, $\rho_R$ the density for region $R$, $C_{vR}$ specific heat, $k_R$ is the thermal conductivity. 
 
-\subsection{Reduction to 1D problem}
-Based on our assumptions, we reduce spatial dependence to only on radius $r$: 
-\begin{align}
-\rho_R\ C_{vR}\ \frac{\partial T}{\partial t}&=\frac{\partial }{\partial r}\big(k_R\frac{\partial T}{\partial r}\big),\label{heat1d}\\
-\rho_{m}\ C_{vm}\ \frac{\partial T}{\partial t}&=\sigma E^2-\sigma \alpha E\cdot \frac{\partial T}{\partial r}+\frac{\partial }{\partial r}[(k_m+\sigma\alpha^2T)\frac{\partial T}{\partial r}-\sigma\alpha T E],\label{elec1d}\\
-\epsilon\frac{\partial E}{\partial t}&=J_0-\sigma E+\sigma\alpha\frac{\partial T}{\partial r}.\label{chargedensity1d}
-\end{align}
+%The middle layer is the thermoelectric region, governed by 
+%\begin{align}
+%\rho_{m}\ C_{vm}\ \frac{\partial T}{\partial t}&=\sigma\bE\cdot\bE-\sigma\cdot \alpha\bE\cdot \nabla T+\nabla\cdot[(k_m+\sigma\alpha^2T)\nabla T-\sigma\alpha T\bE],\label{elec}\\
+%\frac{\partial \rho}{\partial t}&=\nabla\cdot (-\sigma\bE+\sigma\alpha\nabla T).\label{chargedensity}
+%\end{align}
+%Here $\bE$ is the electric field, $\rho$ the charge density, $\sigma$ the electric conductivity, and $\alpha$ the Seebeck coefficient (\textcolor{red}{with temp dependence $\alpha=\alpha(T)$. Need curve fitting to decide}). 
 
-Here \eqref{chargedensity1d} is the result of integrating \eqref{chargedensity}, and $J_0$ a constant. 
+%\textcolor{red}{DO NOT KNOW ANY PARAMETERS}
 
-\subsection{Radial boundary conditions}
+%\subsection{Reduction to 1D problem}
+%Based on our assumptions, we reduce spatial dependence to only on radius $r$: 
+%\begin{align}
+%\rho_R\ C_{vR}\ \frac{\partial T}{\partial t}&=\frac{\partial }{\partial r}\big(k_R\frac{\partial T}{\partial r}\big),\label{heat1d}\\
+%\rho_{m}\ C_{vm}\ \frac{\partial T}{\partial t}&=\sigma E^2-\sigma \alpha E\cdot \frac{\partial T}{\partial r}+\frac{\partial }{\partial r}[(k_m+\sigma\alpha^2T)\frac{\partial T}{\partial r}-\sigma\alpha T E],\label{elec1d}\\
+%\epsilon\frac{\partial E}{\partial t}&=J_0-\sigma E+\sigma\alpha\frac{\partial T}{\partial r}.\label{chargedensity1d}
+%\end{align}
 
-From outside inwards, the boundary conditions are:
-\begin{itemize}
-\item Outside: tree bark has $T_{amb}$.
-\item Between Heat Source and Thermoelectric region, a voltage $V_0$ is generated, \textcolor{red}{heat flux and temperature??}
-\item \textcolor{red}{section A. in Yan paper}
+%Here \eqref{chargedensity1d} is the result of integrating \eqref{chargedensity}, and $J_0$ a constant. 
 
-\end{itemize}
+%\subsection{Radial boundary conditions}
+
+%From outside inwards, the boundary conditions are:
+%\begin{itemize}
+%\item Outside: tree bark has $T_{amb}$.
+%\item Between Heat Source and Thermoelectric region, a voltage $V_0$ is generated, \textcolor{red}{heat flux and temperature??}
+%\item \textcolor{red}{section A. in Yan paper}
+
+%\end{itemize}
 
 \newpage
 Reference\textcolor{red}{BAD FORMAT. FOR convience only}
@@ -232,6 +233,8 @@ Reference\textcolor{red}{BAD FORMAT. FOR convience only}
 \item Chen, J., et al, An empirical model for predictin diurnal air-temperature gradients from edge into old-growth Douglas-fir forest, Ecological Modeling, Vol. 67, Issues 2-4, pg 179-198, June 1993\label{airtempforest}
 
 \item Tanja, S. et al., Air temperature triggers the recovery of evergreen boreal forest photosynthesis in spring, Global Change Biology, vol 9, issue 10, pg 1410-1426, Oct 2003\label{evergreen}
+
+\item Linge S., Langtangen H.P. (2017) Diffusion Equations. In: Finite Difference Computing with PDEs. Texts in Computational Science and Engineering, vol 16. Springer, Cham\label{2017book}
 
 \end{enumerate}
 
