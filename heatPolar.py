@@ -65,7 +65,7 @@ for t in range(1, N_steps):
             + k2*(T[t-1, i+1, j] - T[t-1, i-1, j])\
             + k3*(T[t-1, i, j+1] - 2*T[t-1, i, j] + T[t-1, i, j-1])
 
-        T[t, i, -1] = T[t, i, 0]  # Update the values for phi=2*pi
+        T[t, i, -1] = T[t, i, 0]  # Update the values for phi=2*pi, BC in phi
 
 #%% visualization with matplolib BUGGY, NEED TO FIX
 #fig = plt.figure()
