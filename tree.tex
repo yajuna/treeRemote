@@ -102,7 +102,7 @@ Notations:
 \subsection{The heat equation in cylindircal coordinates}
 The basic heat equation for temperature distribution is 
 \begin{equation}
-\rho c\frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\frac{1}{r}\frac{\partial}{\partial \phi}\bigg(\frac{k}{r}\frac{\partial T}{\partial \phi}\bigg)
+\rho c\frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\frac{1}{r}\frac{\partial}{\partial \phi}\bigg(\frac{k}{r}\frac{\partial T}{\partial \phi}\bigg)\label{heat}
 \end{equation}
 
 We add source terms for the diffusion equation to obtain
@@ -138,6 +138,22 @@ Our goal now is to solve this 2D differential equation with FD scheme.
 \subsection{FD scheme for the heat equation}
 
 A detailed discussion about polar heat equation is in [\ref{2017book}]. However, the equation presented there was axi-symmetric, and our equation depends on the azimuth angle $\phi$. Our goal is to modify the equation, therefore method presented. \textcolor{red}{pg.251, section 3.5.6}
+
+\textcolor{red}{Assume for now that $\rho,\ c, k$ are all constants}
+
+With constant coefficients, equation \eqref{heat} is simplified to 
+
+\begin{equation}
+\frac{\rho c}{k}\frac{\partial T}{\partial t}=\frac{\partial^2 T}{\partial r^2}+\frac{1}{r}\frac{\partial T}{\partial r}+\frac{1}{r^2}\frac{\partial^2 T}{\partial \phi^2}\label{simple_heat}
+\end{equation}
+
+Discretize the above equation to get
+\begin{align}
+T^1_{i,j}=& \frac{k\Delta t}{\rho c}\bigg[\frac{1}{(\Delta r)^2}\bigg(T^0_{i-1,j}+T^0_{i+1,j}-2T^0_{i,j}\bigg)+\frac{1}{2r_i\Delta r}\bigg(T^0_{i+1,j}-T^0_{i-1,j}\bigg)\nonumber\\
++&\frac{1}{r_i^2(\Delta \phi)^2}\bigg(T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}\bigg)\bigg]+T^0_{i,j}
+\end{align}
+
+\textcolor{red}{with centered difference in time. Will modify to be Crank-Nicolson}
 
 \subsection{Implementation in Python and numerical results}
 %\newpage
