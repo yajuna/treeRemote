@@ -3,7 +3,9 @@
 \usepackage{amsmath, amsthm, ulem, graphicx, marvosym, fancyhdr, amscd, amssymb, mathrsfs,color,subcaption,nicefrac,hyperref}
 \usepackage{framed}
 \usepackage{tikz}
-\usepackage{showkeys}
+\usetikzlibrary{decorations.pathreplacing,angles,quotes}
+\usepackage[inline]{showlabels}
+\usepackage{multicol}
 
 \newcommand\Z{{\mathbb Z}}
 \newcommand\F{{\mathbb F}}
@@ -12,6 +14,10 @@
 \newcommand\p{{\mathscr P}}
 \newcommand\R{{\mathbb R}}
 \newcommand\Q{{\mathbb Q}}
+
+\tikzset{every label/.style={font=\footnotesize,inner sep=1pt}}
+\newcommand{\stencilpt}[4][]{\node[circle,fill,draw,inner sep=1.5pt,label={above left:#4},#1] at (#2) (#3) {}}
+
 
 \topmargin -.5in
 \evensidemargin-.3in
@@ -78,15 +84,16 @@
 \item With the previous assumption, we place all devices at the same height, and same depth
 \end{enumerate}
 
-\section{To do (Feb 7)}
-Our goal is to write Python scripts that would simulate the temperature distribution in the trunk of the tree and the ambient environment. We will use the heat model for both. See the following reference for more detail:
+\section{To do (March)}
 \begin{enumerate}
-\item Within a tree stem: see [\ref{heat}]
-\item Ambient temperature: see [\ref{airtempforest}] and [\ref{evergreen}]
+\item get heat program running in Python3 (eliminate all syntax error)
+\item find appropriate parameters for testing
+\item think of ways to validate computation (analytical solution, similar and simpler problem)
+\item write a documentation (i.e., this file??)
 \end{enumerate}
 
 \section{PDE model of temperature within a tree stem}
-\subsection{Parameters\textcolor{red}{to collect and verify. Nick}}
+\subsection{Parameters \textcolor{red}{ to collect and verify. Nick}}
 Notations: 
 \begin{enumerate}
 \item $T$: temperature (K)
@@ -99,8 +106,8 @@ Notations:
 \item $\alpha$: albedo of the surface
 \end{enumerate}
 
-\subsection{The heat equation in cylindircal coordinates}
-The basic heat equation for temperature distribution is 
+\subsection{The heat equation in cylindrical coordinates}
+The standard heat equation for temperature distribution in cylindrical coordinates is 
 \begin{equation}
 \rho c\frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\frac{1}{r}\frac{\partial}{\partial \phi}\bigg(\frac{k}{r}\frac{\partial T}{\partial \phi}\bigg)\label{heat}
 \end{equation}
@@ -129,33 +136,91 @@ more details in \ref{heat}.
 
 \end{enumerate}
 
-Our goal now is to solve this 2D differential equation with FD scheme.
+In this work, we solve the heat equation to model the temperature in tree trunks, for the purpose of energy harvesting. We modify above source terms to fit the parameters for trees in Washington state.
 
 
 
 \textcolor{red}{https://pycav.readthedocs.io/en/latest/api/pde/crank\_nicolson.html}
 
 \subsection{FD scheme for the heat equation}
+We solve the above equation numerically with the Finite-Difference (FD) method, as the FD method is simple to implement, and robust.  
 
-A detailed discussion about polar heat equation is in [\ref{2017book}]. However, the equation presented there was axi-symmetric, and our equation depends on the azimuth angle $\phi$. Our goal is to modify the equation, therefore method presented. \textcolor{red}{pg.251, section 3.5.6}
+A detailed discussion on axi-symmetric heat equation is in [\ref{2017book}]. We model the heat equation to depend on the azimuth angle $\phi$, as trees in Washington state experience different sunlight and therefore growth in different direction. \textcolor{red}{pg.251, section 3.5.6}
 
-\textcolor{red}{Assume for now that $\rho,\ c, k$ are all constants}
-
-With constant coefficients, equation \eqref{heat} is simplified to 
-
+For simplicity of discussion, we assume $\rho,\ c, k$ are all constants for now. Then the constant coefficient equation \eqref{heat} simplifies to 
 \begin{equation}
 \frac{\rho c}{k}\frac{\partial T}{\partial t}=\frac{\partial^2 T}{\partial r^2}+\frac{1}{r}\frac{\partial T}{\partial r}+\frac{1}{r^2}\frac{\partial^2 T}{\partial \phi^2}\label{simple_heat}
 \end{equation}
 
-Discretize the above equation to get
+With centered FD discretization in time and space, we have
+\begin{itemize}\begin{multicols}{2}
+\item $\frac{\partial T}{\partial t}\approx\frac{T^1_{i,j}-T^0_{i,j}}{\Delta t}$
+\item $\frac{\partial T}{\partial r}\approx\frac{T^0_{i+1,j}-T^0_{i-1,j}}{2\Delta r}$
+\item $\frac{\partial^2 T}{\partial r^2}\approx\frac{T^0_{i-1,j}+T^0_{i+1,j}-2T^0_{i,j}}{(\Delta r)^2}$
+\item $\frac{\partial^2 T}{\partial \phi^2}\approx\frac{T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}}{(\Delta \phi)^2}$
+\end{multicols}\end{itemize}
+
+Here $T^n_{i,j} \approx T(r_i,\phi_j,t_n)$ denotes the numerical solution at the point $(r_i,\phi_j,t_n)$. Then the above {\it continuous differential equation} becomes the following {\it discrete difference equation}:
 \begin{align}
 T^1_{i,j}=& \frac{k\Delta t}{\rho c}\bigg[\frac{1}{(\Delta r)^2}\bigg(T^0_{i-1,j}+T^0_{i+1,j}-2T^0_{i,j}\bigg)+\frac{1}{2r_i\Delta r}\bigg(T^0_{i+1,j}-T^0_{i-1,j}\bigg)\nonumber\\
-+&\frac{1}{r_i^2(\Delta \phi)^2}\bigg(T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}\bigg)\bigg]+T^0_{i,j}
++&\frac{1}{r_i^2(\Delta \phi)^2}\bigg(T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}\bigg)\bigg]+T^0_{i,j},
 \end{align}
+with $k_1= \frac{k\Delta t}{\rho c(\Delta r)^2}$, $k_2 = \frac{k\Delta t}{2\rho cr_i\Delta r}$, and $k_3= \frac{k\Delta t}{\rho cr_i^2(\Delta \phi)^2}$, above equation can be implemented as
+\begin{equation}
+T^1_{i,j}= k_1\bigg(T^0_{i-1,j}+T^0_{i+1,j}-2T^0_{i,j}\bigg)+k_2\bigg(T^0_{i+1,j}-T^0_{i-1,j}\bigg)
++k_3\bigg(T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}\bigg)+T^0_{i,j},
+\end{equation}
+where we obtain $T^1_{i,j}$ each time step with $T$ values in several locations from previous step. 
+
+\begin{center}\begin{tikzpicture}
+  \stencilpt{-2,0}{i-2}{$T^0_{i-1,j}$};
+  \stencilpt[blue]{ 0,0}{i}  {$T^0_{i,j}$};
+    \stencilpt{ 2,0}{i+2}{$T^0_{i+1,j}$};
+  \stencilpt{0,-2}{j-2}{$T^0_{i,j-1}$};
+  \stencilpt{0, 2}{j+2}{$T^0_{i,j+1}$};
+  \draw (j-2) -- (j+2)
+        (i-2) -- (i+2);
+\end{tikzpicture}
+
+Space information at each time step.
+\end{center}
+Image one more axis normal to the paper, pointing outwards above the blue dot. That would be $T^1_{i,j}$. 
+
+%For future: tikz image: 
+%
+%\newcommand{\stencilpt}[4][]{\node[circle,draw,inner sep=0.1em,minimum size=0.8cm,font=\tiny,#1] at (#2) (#3) {#4}}
+%\begin{tikzpicture}
+%  \stencilpt{-2,0}{i-2}{$-1/12$};
+%  \stencilpt{-1,0}{i-1}{$4/3$};
+%  \stencilpt{ 0,0}{i}  {$-5$};
+%  \stencilpt{ 1,0}{i+1}{$4/3$};
+%  \stencilpt{ 2,0}{i+2}{$-1/12$};
+%  \stencilpt{0,-2}{j-2}{$-1/12$};
+%  \stencilpt{0,-1}{j-1}{$4/3$};
+%  \stencilpt[blue]{0, 1}{j+1}{$4/3$};
+%  \stencilpt{0, 2}{j+2}{$-1/12$};
+%  \draw (j-2) -- (j-1)
+%        (j-1) -- (i)
+%        (i)   -- (j+1)
+%        (j+1) -- (j+2)
+%        (i-2) -- (i-1)
+%        (i-1) -- (i)
+%        (i)   -- (i+1)
+%        (i+1) -- (i+2);
+%\end{tikzpicture}
+
+
 
 \textcolor{red}{with centered difference in time. Will modify to be Crank-Nicolson}
 
 \subsection{Implementation in Python and numerical results}
+For vectorization, we rewrite the above equation as 
+\begin{equation}
+T^1_{i,j}= (k_1-k_2)T^0_{i-1,j}+(k_1+k_2)T^0_{i+1,j}+(1-2k_1-2k_3)T^0_{i,j}+
++k_3T^0_{i,j-1}+k_3T^0_{i,j+1}
+\end{equation}
+
+Read Chapter 9 of Randy LeVeque. 
 %\newpage
 
 %\section{To do (Jan 31)}
@@ -231,6 +296,12 @@ T^1_{i,j}=& \frac{k\Delta t}{\rho c}\bigg[\frac{1}{(\Delta r)^2}\bigg(T^0_{i-1,j
 %\item Outside: tree bark has $T_{amb}$.
 %\item Between Heat Source and Thermoelectric region, a voltage $V_0$ is generated, \textcolor{red}{heat flux and temperature??}
 %\item \textcolor{red}{section A. in Yan paper}
+
+%Our goal is to write Python scripts that would simulate the temperature distribution in the trunk of the tree and the ambient environment. We will use the heat model for both. See the following reference for more detail:
+%\begin{enumerate}
+%\item Within a tree stem: see [\ref{heat}]
+%\item Ambient temperature: see [\ref{airtempforest}] and [\ref{evergreen}]
+%\end{enumerate}
 
 %\end{itemize}
 
