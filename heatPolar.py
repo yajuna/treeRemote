@@ -33,6 +33,8 @@ Questions about workflow:
     (Is there a better option than copy-paste? I know I can push files from commandline, but I am confused about how.)
     Is Spyder a good choice of IDE? When do we use an IDE like Spyder as opposed to something like Jupyter Notebook?
     Where does Spyder save my file when I hit save? Does temporary mean it goes away when I close out or are they somewhere eating up storage space?
+    When I clone the Git repository to my computer using the clone command from commandline, is that a live updating version?
+    How to avoid having a lot of separate versions of the script saved locally on my computer that are hard to keep track of?
 Questions about the script:
     Here is the error message I am getting when I attempt to run. I think this is the problem we were talking about before, where
     the first warning has to do with something probably being the wrong order of magnitude, and the second warning is because 
