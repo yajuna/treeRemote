@@ -35,6 +35,8 @@ Questions about workflow:
     Where does Spyder save my file when I hit save? Does temporary mean it goes away when I close out or are they somewhere eating up storage space?
     When I clone the Git repository to my computer using the clone command from commandline, is that a live updating version?
     How to avoid having a lot of separate versions of the script saved locally on my computer that are hard to keep track of?
+Questions about Python syntax:
+    Why are some but not all variables highlighted in orange in Github when you view the code? (probably not important)
 Questions about the script:
     Here is the error message I am getting when I attempt to run. I think this is the problem we were talking about before, where
     the first warning has to do with something probably being the wrong order of magnitude, and the second warning is because 
@@ -43,7 +45,11 @@ Questions about the script:
           + k3*(T[t-1, i, j+1] - 2*T[t-1, i, j] + T[t-1, i, j-1])
         /Users/selinateng/.spyder-py3/temp.py:73: RuntimeWarning: invalid value encountered in double_scalars
           + k3*(T[t-1, i, j+1] - 2*T[t-1, i, j] + T[t-1, i, j-1])
-      
+Notes for self:
+    Ctrl+e skips to end of line after auto-closed parens/brackets
+    #%% separates the code into cells (imitates Jupyter, good way to visually separate functions from each other)
+    jn_zeros is for Bessel functions (solutions to Bessel's diffeq which appear in the solution to Laplace's equation in cylindrical coordinates)
+    
 """
 import numpy as np
 from scipy.special import jv, jn_zeros
