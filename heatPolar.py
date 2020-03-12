@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
@@ -19,6 +26,22 @@ To Fix:
     vectorize to increase efficiency
 
 @author: yajun
+"""
+"""
+Questions about workflow:
+    Is it correct to copy-paste the file from Git, edit it in my choice of IDE, then copy-paste my edited file back into the Github browser window? 
+    (Is there a better option than copy-paste? I know I can push files from commandline, but I am confused about how.)
+    Is Spyder a good choice of IDE? When do we use an IDE like Spyder as opposed to something like Jupyter Notebook?
+    Where does Spyder save my file when I hit save? Does temporary mean it goes away when I close out or are they somewhere eating up storage space?
+Questions about the script:
+    Here is the error message I am getting when I attempt to run. I think this is the problem we were talking about before, where
+    the first warning has to do with something probably being the wrong order of magnitude, and the second warning is because 
+    something is a negative value that shouldn't be. Just to make sure, this is the expected result?
+        /Users/selinateng/.spyder-py3/temp.py:73: RuntimeWarning: overflow encountered in double_scalars
+          + k3*(T[t-1, i, j+1] - 2*T[t-1, i, j] + T[t-1, i, j-1])
+        /Users/selinateng/.spyder-py3/temp.py:73: RuntimeWarning: invalid value encountered in double_scalars
+          + k3*(T[t-1, i, j+1] - 2*T[t-1, i, j] + T[t-1, i, j-1])
+      
 """
 import numpy as np
 from scipy.special import jv, jn_zeros
