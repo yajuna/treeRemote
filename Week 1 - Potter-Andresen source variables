@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Apr  1 18:27:23 2020
+Source variables for heat exchange in tree
+Dummy constants for everything except solar constant S_0 and Stefan Boltzmann constant sigma
+Ref: Potter & Andresen 2002 
+
+@author: selinateng
+"""
+
+from math import cos
+from math import sqrt
+
+
+#CONSTANTS
+
+#(1) Conduction
+r = 1               #Distance from center of tree
+
+phi = 90            #Azimuth angle (measured clockwise with south being phi = 0)
+
+ro = 1              #Wood density (kg/m^3)
+
+c = 1               #Specific heat (J/kg*K)
+
+T_in = 1            #Temperature of tree interior (K)
+
+k = 1               #Thermal conductivity (W/(m*K))
+
+
+#(2) Convective Heat Loss
+T_sfc = 1           #Temperature of tree surface (K)
+
+T_air = 1           #Temperature of surrounding air (K)
+
+L = 1               #Vertical height (m)
+
+R = 1               #Tree radius (m)
+
+theta1 = 10         #Difference between wind direction and the aspect of the 
+                    #surface point (degrees)
+
+u = 1               #Windspeed (m/s)
+
+
+#(3) Solar Radiative Heating
+S_0 = 1368          #Solar constant (W/m^2)
+
+tau = 0.7           #Atmospheric transmissivity (unitless) - at midlatitude 
+                    #& low elevation, approx 0.76-0.81
+                    
+eta = 0.8           #Atmospheric absorption parameter (unitless) - at 
+                    #midlatitude & low elevation, approx 0.80-0.84
+                    
+Z = 90              #Solar zenith angle (degrees)
+
+i = 90              #Angle of incidence, the angle between the direction of 
+                    #sunlight and the local normal to the tree's surface
+
+#(4) Long Wave Radiation
+#This function also uses T_sfc and T_air (see #2)
+sigma = 5.67 * 10**(-8)     #Stefan Boltzmann constant (W/(m^2*K^4))
+
+
+H = convectiveHeatLoss(T_sfc, T_air, L, R, theta1, u)
+print(H)
+S = solarRadiationHeating(S_0, tau, eta, Z, i)
+print(S)
+IR = longWaveRadiation(T_sfc, T_air, sigma)
+print(IR)
+
+
+   
+
+
+#(1) Conduction
+def conduction(r, phi, ro, c, T_in, k):   
+    
+    #Differential equations in python??
+
+    return 0
+
+
+#(2) Convective Heat Loss
+def convectiveHeatLoss(T_sfc, T_air, L, R, theta1, u):
+    if (theta1 < 90):   #Theta is the lesser of 90 degrees or theta1
+        theta = theta1 
+    else: 
+        theta = 90
+    h_free = 18.293 * abs(T_sfc - T_air) / (L * T_air**3)**0.25 * (T_air + 97.77) / sqrt(179.02 + T_air)
+    h_forced = 3.458 * (T_air + T_sfc - 0.74)**0.49 * (u / (R * T_air))**0.5 * (1 - (theta / 90)**3)
+    h = h_free + h_forced
+    H = h * (T_sfc - T_air) 
+    return H
+
+
+#(3) Solar Radiative Heating
+def solarRadiationHeating(S_0, tau, eta, Z, i):
+    #Total solar radiation incident at a specific surface point is the sum of 
+    #direct and diffuse solar radiation
+    #Should do loop for multiple i's
+    if (i > 90):
+        S_dir = 0
+    else:
+        S_dir = S_0 * tau**(1 / cos(Z)) * cos(i)    
+    S_dif = S_0 * cos(Z) / 3 * (1 + cos(Z)) * (eta - (tau)**(1 / cos(Z)))
+    S = S_dir + S_dif
+    return S
+
+
+#(4) Long Wave Radiation
+def longWaveRadiation(T_sfc, T_air, sigma):
+    IR_out = sigma * T_sfc**4
+    IR_in = sigma * T_air**4
+    IR = IR_in - IR_out
+    return IR
+
