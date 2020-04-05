@@ -6,19 +6,51 @@ Source variables for heat exchange in tree
 Dummy constants for everything except solar constant S_0 and Stefan Boltzmann constant sigma
 Ref: Potter & Andresen 2002 
 
+
+Sat 4/4/20
+Feedback 
+    Purpose of T_in? -> conduction edquation
+    T_sfc and T_air need to be variable
+    Unexplained constants (97.77 etc) from paper may not be true for us
+    Still need to code conduction equation
+Updates
+    r and phi are variables
+        r between 0 and max radius of tree (for now 1m)
+        phi between 0 and 2pi
+    Corrected the way libraries are imported
+    Corrected angle values in degrees to be in radians
+    Added the main function and code to clear variables at start
+    Added missing albedo variable to solar radiation function
+    
+
 @author: selinateng
 """
 
-from math import cos
-from math import sqrt
+#Clear existing variables and console
+try:
+    from IPython import get_ipython
+    get_ipython().magic('clear')
+    get_ipython().magic('reset -f')
+except:
+    pass
+
+
+import math
+import numpy as np
+from scipy.integrate import odeint
+import matplotlib.pyplot as plt
 
 
 #CONSTANTS
+"""
+all variable and constant names match the Potter and Andresen paper except
+for T_in, which is T in the basic heat equation for conduction (Potter and 
+Andresen, [1])
+all constants are currently represented with filler values
+"""
 
-#(1) Conduction
-r = 1               #Distance from center of tree
-
-phi = 90            #Azimuth angle (measured clockwise with south being phi = 0)
+#Overall Conduction Equation
+r_max = 1           #Max. radius of tree
 
 ro = 1              #Wood density (kg/m^3)
 
@@ -29,7 +61,7 @@ T_in = 1            #Temperature of tree interior (K)
 k = 1               #Thermal conductivity (W/(m*K))
 
 
-#(2) Convective Heat Loss
+#Convective Heat Loss 
 T_sfc = 1           #Temperature of tree surface (K)
 
 T_air = 1           #Temperature of surrounding air (K)
@@ -38,81 +70,89 @@ L = 1               #Vertical height (m)
 
 R = 1               #Tree radius (m)
 
-theta1 = 10         #Difference between wind direction and the aspect of the 
-                    #surface point (degrees)
+theta1 = math.pi    #Difference between wind direction and the aspect of the 
+                    #surface point (radians)
 
 u = 1               #Windspeed (m/s)
 
 
-#(3) Solar Radiative Heating
-S_0 = 1368          #Solar constant (W/m^2)
-
+#Solar Radiative Heating
 tau = 0.7           #Atmospheric transmissivity (unitless) - at midlatitude 
                     #& low elevation, approx 0.76-0.81
                     
 eta = 0.8           #Atmospheric absorption parameter (unitless) - at 
                     #midlatitude & low elevation, approx 0.80-0.84
                     
-Z = 90              #Solar zenith angle (degrees)
+Z = 2 * math.pi     #Solar zenith angle (radians)
 
-i = 90              #Angle of incidence, the angle between the direction of 
+i = 2 * math.pi     #Angle of incidence, the angle between the direction of 
                     #sunlight and the local normal to the tree's surface
-
-#(4) Long Wave Radiation
+                    
+alpha = 0           #Albedo of surface
+                    
+#Long Wave Radiation
 #This function also uses T_sfc and T_air (see #2)
-sigma = 5.67 * 10**(-8)     #Stefan Boltzmann constant (W/(m^2*K^4))
 
 
-H = convectiveHeatLoss(T_sfc, T_air, L, R, theta1, u)
-print(H)
-S = solarRadiationHeating(S_0, tau, eta, Z, i)
-print(S)
-IR = longWaveRadiation(T_sfc, T_air, sigma)
-print(IR)
+#VARIABLES
+r = np.linspace(0, r_max, 1000)    #Distance from center of tree
+phi = np.linspace(0, 2*math.pi, 1000)   #Azimuth angle (measured clockwise with south being phi = 0)
 
 
-   
+def main():
+    result = conduction()
 
-
-#(1) Conduction
-def conduction(r, phi, ro, c, T_in, k):   
-    
-    #Differential equations in python??
-
+#Conduction
+def conduction():   
+    #This function should be equation [10] in Potter/Andresen
+    #For now, here are all the source terms together
+    H = convectiveHeatLoss(T_sfc, T_air, L, R, theta1, u)
+    S = solarRadiationHeating(tau, eta, Z, i, alpha)
+    IR = longWaveRadiation(T_sfc, T_air)
+    tot = H + S + IR
+    #Print values to check
+    print(H)
+    print(S)
+    print(IR)
     return 0
 
 
-#(2) Convective Heat Loss
+#Convective Heat Loss
 def convectiveHeatLoss(T_sfc, T_air, L, R, theta1, u):
-    if (theta1 < 90):   #Theta is the lesser of 90 degrees or theta1
+    if (theta1 < (2 * math.pi)):   #Theta is the lesser of 2pi radians or theta1
         theta = theta1 
     else: 
-        theta = 90
-    h_free = 18.293 * abs(T_sfc - T_air) / (L * T_air**3)**0.25 * (T_air + 97.77) / sqrt(179.02 + T_air)
+        theta = Z = 2 * math.pi
+    h_free = 18.293 * abs(T_sfc - T_air) / (L * T_air**3)**0.25 * (T_air + 97.77) / math.sqrt(179.02 + T_air)
     h_forced = 3.458 * (T_air + T_sfc - 0.74)**0.49 * (u / (R * T_air))**0.5 * (1 - (theta / 90)**3)
     h = h_free + h_forced
     H = h * (T_sfc - T_air) 
     return H
 
 
-#(3) Solar Radiative Heating
-def solarRadiationHeating(S_0, tau, eta, Z, i):
+#Solar Radiative Heating
+def solarRadiationHeating(tau, eta, Z, i, alpha):
     #Total solar radiation incident at a specific surface point is the sum of 
     #direct and diffuse solar radiation
+    S_0 = 1368          #Solar constant (W/m^2)
     #Should do loop for multiple i's
     if (i > 90):
         S_dir = 0
     else:
-        S_dir = S_0 * tau**(1 / cos(Z)) * cos(i)    
-    S_dif = S_0 * cos(Z) / 3 * (1 + cos(Z)) * (eta - (tau)**(1 / cos(Z)))
-    S = S_dir + S_dif
+        S_dir = S_0 * tau**(1 / math.cos(Z)) * math.cos(i)    
+    S_dif = S_0 * math.cos(Z) / 3 * (1 + math.cos(Z)) * (eta - (tau)**(1 / math.cos(Z)))
+    S = (S_dir + S_dif)*(1 - alpha)
     return S
 
 
-#(4) Long Wave Radiation
-def longWaveRadiation(T_sfc, T_air, sigma):
+#Long Wave Radiation
+def longWaveRadiation(T_sfc, T_air):
+    sigma = 5.67 * 10**(-8)     #Stefan Boltzmann constant (W/(m^2*K^4))
     IR_out = sigma * T_sfc**4
     IR_in = sigma * T_air**4
     IR = IR_in - IR_out
     return IR
 
+
+if __name__ == '__main__':
+    main()
