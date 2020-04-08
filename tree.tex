@@ -81,14 +81,18 @@
 %With these assumptions, the DE problem reduces to 1D.
 \begin{enumerate}
 \item We assume all trees we consider are roughly the same. That means same height, same radius
-\item With the previous assumption, we place all devices at the same height, and same depth
+\item With the previous assumption, we place all devices at the same height (therefore eliminating the $z$ variable in the heat equation), and same depth
 \end{enumerate}
 
-\section{To do (March)}
+\section{To do (April)}
 \begin{enumerate}
-\item get heat program running in Python3 (eliminate all syntax error)
-\item find appropriate parameters for testing
-\item think of ways to validate computation (analytical solution, similar and simpler problem)
+\item get heat programs running in Python3 (eliminate all syntax error)
+\begin{itemize}
+\item write source terms from Potter 2002
+\item write 2D heat code with both second order centered difference, and ADT method.
+\end{itemize}
+\item find appropriate parameters for testing (ask hardware group)
+\item ways to validate computation (numerical analysis methods)
 \item write a documentation (i.e., this file??)
 \end{enumerate}
 
@@ -136,23 +140,25 @@ more details in \ref{heat}.
 
 \end{enumerate}
 
+\textcolor{red}{Question to think about: Take part of the source term as boundary condition? What is the boundary condition with source term already implemented?}
+
 In this work, we solve the heat equation to model the temperature in tree trunks, for the purpose of energy harvesting. We modify above source terms to fit the parameters for trees in Washington state.
 
 
 
-\textcolor{red}{https://pycav.readthedocs.io/en/latest/api/pde/crank\_nicolson.html}
+%\href{https://pycav.readthedocs.io/en/latest/api/pde/crank_nicolson.html}{ref for CN 2D}
 
 \subsection{FD scheme for the heat equation}
 We solve the above equation numerically with the Finite-Difference (FD) method, as the FD method is simple to implement, and robust.  
 
 A detailed discussion on axi-symmetric heat equation is in [\ref{2017book}]. We model the heat equation to depend on the azimuth angle $\phi$, as trees in Washington state experience different sunlight and therefore growth in different direction. \textcolor{red}{pg.251, section 3.5.6}
 
-For simplicity of discussion, we assume $\rho,\ c, k$ are all constants for now. Then the constant coefficient equation \eqref{heat} simplifies to 
+For simplicity of discussion, we assume $\rho,\ c, k$ are all constants. This is a reasonable assumption, as the trees should not have parameters that change drastically within the trunk. Then the constant coefficient equation \eqref{heat} simplifies to 
 \begin{equation}
 \frac{\rho c}{k}\frac{\partial T}{\partial t}=\frac{\partial^2 T}{\partial r^2}+\frac{1}{r}\frac{\partial T}{\partial r}+\frac{1}{r^2}\frac{\partial^2 T}{\partial \phi^2}\label{simple_heat}
 \end{equation}
 
-With centered FD discretization in time and space, we have
+With centered FD discretization in space, and forward in time for example, we have
 \begin{itemize}\begin{multicols}{2}
 \item $\frac{\partial T}{\partial t}\approx\frac{T^1_{i,j}-T^0_{i,j}}{\Delta t}$
 \item $\frac{\partial T}{\partial r}\approx\frac{T^0_{i+1,j}-T^0_{i-1,j}}{2\Delta r}$
@@ -160,17 +166,26 @@ With centered FD discretization in time and space, we have
 \item $\frac{\partial^2 T}{\partial \phi^2}\approx\frac{T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}}{(\Delta \phi)^2}$
 \end{multicols}\end{itemize}
 
-Here $T^n_{i,j} \approx T(r_i,\phi_j,t_n)$ denotes the numerical solution at the point $(r_i,\phi_j,t_n)$. Then the above {\it continuous differential equation} becomes the following {\it discrete difference equation}:
+Here $T^n_{i,j} \approx T(r_i,\phi_j,t_n)$ denotes the numerical solution at the point $(r_i,\phi_j,t_n)$. In general, we compute the heat equation iteratively in time with the general time forwarding scheme: 
+\begin{equation}
+\frac{T^1_{i,j}-T^0_{i,j}}{\Delta t}=D\ T_{i,j},
+\end{equation}
+where the right hand side is a discretization in space, with $D$ being the difference operator. Depending on $D$, the above {\it continuous differential equation} can be discretized in the following two ways:
+\subsubsection{Forward in time, centered difference Method (FTCD)}
+The FTCD is the most straightforward method, where we directly apply the above listed discretization to the heat equation. 
 \begin{align}
-T^1_{i,j}=& \frac{k\Delta t}{\rho c}\bigg[\frac{1}{(\Delta r)^2}\bigg(T^0_{i-1,j}+T^0_{i+1,j}-2T^0_{i,j}\bigg)+\frac{1}{2r_i\Delta r}\bigg(T^0_{i+1,j}-T^0_{i-1,j}\bigg)\nonumber\\
-+&\frac{1}{r_i^2(\Delta \phi)^2}\bigg(T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}\bigg)\bigg]+T^0_{i,j},
+T^1_{i,j}=& \frac{k\Delta t}{\rho c}\bigg[\underbrace{\frac{1}{(\Delta r)^2}\bigg(T^0_{i-1,j}+T^0_{i+1,j}-2T^0_{i,j}\bigg)}_{\frac{\partial^2T}{\partial r^2}}+\underbrace{\frac{1}{2r_i\Delta r}\bigg(T^0_{i+1,j}-T^0_{i-1,j}\bigg)}_{\frac{1}{r}\frac{\partial T}{\partial r}}\nonumber\\
++& \underbrace{\frac{1}{r_i^2(\Delta \phi)^2}\bigg(T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}\bigg)}_{\frac{1}{r^2}\frac{\partial^2 T}{\partial \phi^2}}\bigg]+T^0_{i,j},
 \end{align}
 with $k_1= \frac{k\Delta t}{\rho c(\Delta r)^2}$, $k_2 = \frac{k\Delta t}{2\rho cr_i\Delta r}$, and $k_3= \frac{k\Delta t}{\rho cr_i^2(\Delta \phi)^2}$, above equation can be implemented as
 \begin{equation}
 T^1_{i,j}= k_1\bigg(T^0_{i-1,j}+T^0_{i+1,j}-2T^0_{i,j}\bigg)+k_2\bigg(T^0_{i+1,j}-T^0_{i-1,j}\bigg)
 +k_3\bigg(T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}\bigg)+T^0_{i,j},
 \end{equation}
-where we obtain $T^1_{i,j}$ each time step with $T$ values in several locations from previous step. 
+where we obtain $T^1_{i,j}$ each time step with $T$ values in several locations from previous step. This system of equations can be solved directly. See implementation (that needs modification) in {\tt heatPolar.py}. Here we can denote the general scheme to be 
+\begin{equation}
+\frac{T^1_{i,j}-T^0_{i,j}}{\Delta t}=D\ T^0_{i,j}.
+\end{equation}
 
 \begin{center}\begin{tikzpicture}
   \stencilpt{-2,0}{i-2}{$T^0_{i-1,j}$};
@@ -184,34 +199,23 @@ where we obtain $T^1_{i,j}$ each time step with $T$ values in several locations 
 
 Space information at each time step.
 \end{center}
-Image one more axis normal to the paper, pointing outwards above the blue dot. That would be $T^1_{i,j}$. 
+Imagine one more axis normal to the paper, pointing outwards above the blue dot. That would be $T^1_{i,j}$. 
 
-%For future: tikz image: 
-%
-%\newcommand{\stencilpt}[4][]{\node[circle,draw,inner sep=0.1em,minimum size=0.8cm,font=\tiny,#1] at (#2) (#3) {#4}}
-%\begin{tikzpicture}
-%  \stencilpt{-2,0}{i-2}{$-1/12$};
-%  \stencilpt{-1,0}{i-1}{$4/3$};
-%  \stencilpt{ 0,0}{i}  {$-5$};
-%  \stencilpt{ 1,0}{i+1}{$4/3$};
-%  \stencilpt{ 2,0}{i+2}{$-1/12$};
-%  \stencilpt{0,-2}{j-2}{$-1/12$};
-%  \stencilpt{0,-1}{j-1}{$4/3$};
-%  \stencilpt[blue]{0, 1}{j+1}{$4/3$};
-%  \stencilpt{0, 2}{j+2}{$-1/12$};
-%  \draw (j-2) -- (j-1)
-%        (j-1) -- (i)
-%        (i)   -- (j+1)
-%        (j+1) -- (j+2)
-%        (i-2) -- (i-1)
-%        (i-1) -- (i)
-%        (i)   -- (i+1)
-%        (i+1) -- (i+2);
-%\end{tikzpicture}
+\subsubsection{Crank-Nicolson Method (CNM)}
+We also solve the heat equation with the Crank-Nicolson method, as it is easy to modify given the FTCD method. To put simply, the general scheme is modified by averaging the space information of the current step and the next step:
+\begin{equation}
+\frac{T^1_{i,j}-T^0_{i,j}}{\Delta t}=\frac{1}{2}D\ T^0_{i,j}+\frac{1}{2}D\ T^1_{i,j}.
+\end{equation}
+The specific scheme is 
+\begin{align}
+& T^1_{i,j}-0.5k_1\bigg(T^1_{i-1,j}+T^1_{i+1,j}-2T^1_{i,j}\bigg)-0.5k_2\bigg(T^1_{i+1,j}-T^1_{i-1,j}\bigg)
+-0.5k_3\bigg(T^1_{i,j-1}+T^1_{i,j+1}-2T^1_{i,j}\bigg)\nonumber\\
+&= 0.5k_1\bigg(T^0_{i-1,j}+T^0_{i+1,j}-2T^0_{i,j}\bigg)+0.5k_2\bigg(T^0_{i+1,j}-T^0_{i-1,j}\bigg)
++0.5k_3\bigg(T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}\bigg)+T^0_{i,j},
+\end{align}
+here $k_1,\ k_2,\ k_3$ are previously defined. 
 
 
-
-\textcolor{red}{with centered difference in time. Will modify to be Crank-Nicolson}
 
 \subsection{Implementation in Python and numerical results}
 For vectorization, we rewrite the above equation as 
