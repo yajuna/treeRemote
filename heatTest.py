@@ -44,7 +44,7 @@ for i in range(size):
 print(s)
 
 # since average of a sinusoid from 0 to 2pi is 0, we will use average from 0 to pi/2
-N = 500
+N = size
 t = np.linspace(0, np.pi / 4, N)
 
 
@@ -71,4 +71,4 @@ for i in range(0, N):
 # omega0 = omega used for sunnyside and shadyside functions
 # omega1 = the angular velocity of the temperature inside the tree with respect to radius
 def internal_temp(A, w0, w1, r, time):
-    return 1 / 2 * (shadyside(A, w0, time) + sunnyside(A, w0, time)) * cos(w1 * r)
+    return 1 / 2 * (shadyside(A, w0, time) + sunnyside(A, w0, time)) *(1 + 0.1*cos(w1 * r))
