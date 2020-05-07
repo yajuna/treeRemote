@@ -24,66 +24,59 @@ import numpy as np
 from scipy.special import jv, jn_zeros
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from mpl_toolkits.mplot3d import Axes3D
+
 #from mayavi import mlab 
 
 #%% Parameters; play with parameters, and see if warnings would go away
 Nr = 50  
 N_phi = 50  
-N_steps = 1000  
+N_steps = 100 
 radius = 5.  
-c = 0.5 # = k/(rho*c) in equation (2) of Potter and Anredsen paper
+c = 50#4 # = k/(rho*c) in equation (2) of Potter and Anredsen paper
 dphi = 2*np.pi/N_phi  
-dr = 5./Nr  
-dt = 0.005   
-if dt< (dr*dphi)**2/2.0: # CFL condition. 
+dphi2 = dphi * dphi
+dr = radius/Nr 
+dr2 = dr * dr 
+dt = 0.001   
+if (1 - 4*dt*c/dr2 - 4*dt*c/(dr2*dphi2))**2<1: # CFL condition. 
     # The maximum value for dt is dr*dphi/(2*c)
-    dt = dr*dphi/(4*c)
-
-
-## for Nr in range(2,500):
+    print("CFL condition is satisfied")
+else: 
+    print("CFL condition not satisfied, shrink dt by 0.0001")
+    dt = dt*0.0001
 #%% Initial conditions; waiting for data
 r = np.linspace(0, radius, Nr)  
 phi = np.linspace(0, 2*np.pi, N_phi)  
-R, phi = np.meshgrid(r, phi) 
-X = R*np.cos(phi) 
-Y = R*np.sin(phi)
-kth_zero = jn_zeros(1, 1) 
-Z = np.cos(phi) * jv(1, kth_zero*R/radius)
-T = np.zeros((N_steps, Nr, N_phi),dtype = 'int64')
+R, Phi = np.meshgrid(r, phi) 
+X = R*np.cos(Phi) 
+Y = R*np.sin(Phi) 
+Z = np.cos(Phi) * (R-R**3)
+print("initial condition sin(phi)*(r-r^3)")
+# T has to be float, can not make it int
+T = np.zeros((N_steps, Nr, N_phi))
 T[0, :, :] = Z.T 
 #%% visualize initial condition in 3D
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
 
-# Plot the surface.
-surf = ax.plot_surface(R, phi, Z, cmap=cm.coolwarm,
-                       linewidth=0, antialiased=False)
-
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-
-surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
-                       linewidth=0, antialiased=False)
 
 #%% Stepping
-k1 = c*dt/dr**2
+k1 = c*dt/dr2
 for t in range(1, N_steps):
     for i in range(0, Nr-1):
+        ri = max(r[i], 0.5*dr)  # To avoid the singularity at r=0
+        k2 = c*dt/(2*ri*dr)
+        k3 = c*dt/(dphi2*ri**2)
+#        print(k2,k3,i)
         for j in range(0, N_phi-1):
-            ri = max(r[i], 0.5*dr)  # To avoid the singularity at r=0
-            k2 = c*dt/(2*ri*dr)
-            k3 = c*dt/(dphi*ri)**2
-            T[t, i, j] = + T[t-1, i, j] \
+            T[t, i, j] = T[t-1, i, j] \
             + k1*(T[t-1, i+1, j] - 2*T[t-1, i, j] + T[t-1, i-1, j])\
             + k2*(T[t-1, i+1, j] - T[t-1, i-1, j])\
             + k3*(T[t-1, i, j+1] - 2*T[t-1, i, j] + T[t-1, i, j-1])#\
 #            + source terms add source terms here
         
-        T[t, i, -1] = T[t, i, 0]  # Update the values for phi=2*pi, BC in phi
+        T[t, :, -1] = T[t, :, 0]  # Update the values for phi=2*pi, BC in phi
 #        T[t,0,i]?? T[t,R,i]??
-        print(np.max(abs(T[t,i,:])))
+    print(np.max(abs(T[t,:,:])),t)
         
 #%% visualization with matplolib BUGGY, NEED TO FIX
 #fig = plt.figure()
