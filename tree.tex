@@ -218,6 +218,24 @@ here $k_1,\ k_2,\ k_3$ are previously defined.
 
 
 \subsection{Implementation in Python and numerical results}
+With the FTCD method, we need to worry about numerical stability. By the von Neumann stability analysis, we write $T(r,\phi, t_n)=e^{ikr+il\phi}$, and $T(r,\phi, t_{n+1})=Ge^{ikr+il\phi}$. We force $G\leq 1$. Plug $T(r,\phi, t_n)=T^0_{i,j}$ and $T(r,\phi, t_{n+1})=T^1_{i,j}$ into the Finite Difference equation, we get (we will temporarily denote $c=\frac{k}{\rho c}$)
+\begin{equation}
+G = c\Delta t \bigg[\frac{1}{(\Delta r)^2}(e^{-ik\Delta r}+e^{ik\Delta r}-2)+\frac{1}{2r_i\Delta r}(e^{ik\Delta r}-e^{-ik\Delta r})+\frac{1}{(r_i\Delta \phi)^2}(e^{-il\Delta \phi}+e^{il\Delta \phi}-2)\bigg]+1
+\end{equation}
+As $r_i\geq \Delta r$, we replace all $r_i$ with $\Delta r$, and we get 
+\begin{equation}
+G\leq c\Delta t \bigg[\frac{1}{(\Delta r)^2}(2\cos(k\Delta r)-2)+\frac{1}{2(\Delta r)^2}2i\sin(k\Delta r)+\frac{1}{(\Delta r\Delta \phi)^2}(2\cos(l\Delta \phi)-2)\bigg]+1
+\end{equation}
+We request $|G|\leq 1$, and it comes down to the following inequality:
+\begin{equation}
+\bigg[1-\frac{c\Delta t}{(\Delta r)^2}4\sin^2(k\Delta r/2)-\frac{c\Delta t}{(\Delta r\Delta \phi)^2}4\sin^2(l\Delta \phi/2)\bigg]^2+\bigg[\frac{c\Delta t}{(\Delta r)^2}\sin(k\Delta r)\bigg]^2\leq 1
+\end{equation}
+Worst case is when $k\Delta r = l\Delta \phi = \pi$, and we get the stability requirement: 
+\begin{equation}
+\bigg(1-\frac{c\Delta t}{(\Delta r)^2}4-\frac{c\Delta t}{(\Delta r\Delta \phi)^2}4\bigg)^2\leq 1
+\end{equation}
+
+
 For vectorization, we rewrite the above equation as 
 \begin{equation}
 T^1_{i,j}= (k_1-k_2)T^0_{i-1,j}+(k_1+k_2)T^0_{i+1,j}+(1-2k_1-2k_3)T^0_{i,j}+
