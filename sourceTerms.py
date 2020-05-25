@@ -29,20 +29,31 @@ k = 1               #Thermal conductivity (W/(m*K))
 T_sfc = 1           #Temperature of tree surface (K)
 T_air = 1           #Temperature of surrounding air (K)
 L = 1               #Vertical height (m)
-R = 1               #Tree radius (m)
+R = 0.09            #Tree radius (m)
 theta1 = np.pi      #Difference between wind direction and the aspect of the surface point (radians)
 u = 1               #Windspeed (m/s)   
 tau = 0.7           #Atmospheric transmissivity (unitless) - at midlatitude 
                     #& low elevation, approx 0.76-0.81                   
 eta = 0.8           #Atmospheric absorption parameter (unitless) - at 
                     #midlatitude & low elevation, approx 0.80-0.84                    
-i = 2 * np.pi       #Angle of incidence, the angle between the direction of 
+#i = 2 * np.pi       #Angle of incidence, the angle between the direction of 
                     #sunlight and the local normal to the tree's surface                   
-alpha = 0           #Albedo of surface
+alpha = 0.3         #Albedo of surface
 LAT = 47.2529
 LON = -122.4443     # Latitude and longitude of Tacoma
 phi_0 = 0
 
+#%% Init Conditions based on Potter/Andresen (pine log in Boulder, CO)
+R = 0.09
+L = 2.4
+alpha = 0.3
+LAT = 40.015
+LON = -105.27
+tau = 0.78
+nu = 0.80
+ro = 686
+c = 2470
+k = 0.46
 
 #%%
 def convectiveHeatLoss():
@@ -82,6 +93,7 @@ def solarRadiationHeating(phi):
     
     # phi = 0 
     """PLACEHOLDER """
+    
     # angle of incidence
     i = abs(az-phi)
     
@@ -93,11 +105,14 @@ def solarRadiationHeating(phi):
     S = (S_dir + S_dif)*(1 - alpha)
     return S
 
-def sourceTerms(phi):
-    H = convectiveHeatLoss()
-    S = solarRadiationHeating(phi)
-    IR = longWaveRadiation()
-    tot = H + S + IR
+def sourceTerms(atSurface, phi):
+    if (atSurface):
+        H = convectiveHeatLoss()
+        S = solarRadiationHeating(phi)
+        IR = longWaveRadiation()
+        tot = H + S + IR
+    else:
+        tot = 0
     return tot
 
 
