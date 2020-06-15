@@ -21,6 +21,10 @@ def sourceTerms(ti):
     exponential = -(ti - mean) ** 2 / (2 * variance ** 2)
     return B + coefficient * np.exp(exponential)
 
+# takes in a time ti
+# returns the output of a Hermine polynomial
+def HermineSourceTerms(ti):
+    return 30 - ((ti-mean)**2 - 1) # 2nd order polynomial
 
 terms = []  # Source terms
 segments = []  # Time intervals each source term is mapped to, in 24 hour clock time
