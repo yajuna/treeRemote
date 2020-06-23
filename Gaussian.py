@@ -21,9 +21,10 @@ def sourceTerms(ti):
     exponential = -(ti - mean) ** 2 / (2 * variance ** 2)
     return B + coefficient * np.exp(exponential)
 
+""" Currently incorrect - need to multiply by Gaussian """
 # takes in a time ti
-# returns the output of a Hermine polynomial
-def HermineSourceTerms(ti):
+# returns the output of a Hermite polynomial
+def HermiteSourceTerms(ti):
     return 30 - ((ti-mean)**2 - 1) # 2nd order polynomial
 
 terms = []  # Source terms
