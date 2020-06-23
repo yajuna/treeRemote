@@ -24,7 +24,9 @@ import numpy as np
 from scipy.special import jv, jn_zeros
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from Gaussian import sourceTerms
+from sourceTerms import sourceTerms # Actual source terms
+#from Gaussian import sourceTerms   # Gaussian source terms 
+#from Gaussian import hermineSourceTerms    # Hermite-Gaussian source terms
 
 # from mayavi import mlab
 
