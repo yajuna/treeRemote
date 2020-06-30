@@ -150,14 +150,17 @@ Notations:
 \end{enumerate}
 
 \subsection{Furthur simplification to one dimensional equation}
-Although we will be working mostly with the above two dimensional heat equation, 
+Although we will be working mostly with the above two dimensional heat equation, [\ref{heat}] provides justification for further reducing the above problem to one dimensional case. As seen in Fig. 2 of [\ref{heat}], biggest temperature difference occurs in south and west asepcts. In our hardware application, we seek to install our devices in the aspects with the highest temperature differences. Based on the location of Washington state \textcolor{red}{and data from hardware group}, we install all devices in the south of the tree trunks. This furthur reduces the heat equation to solve to a one dimensional problem. 
+
+In the following, we discuss the numerical simulation of both two and one dimensional heat equations with several numerical schemes. 
 
 
 %\href{https://pycav.readthedocs.io/en/latest/api/pde/crank_nicolson.html}{ref for CN 2D}
 
-\subsection{FD scheme for the heat equation}
-We solve the above equation numerically with the Finite-Difference (FD) method, as the FD method is simple to implement, and robust.  
+\section{Finite Difference schemes for the heat equation}
+We discuss Finite Difference (FD) schemes for both two and one dimensional heat equation, as the FD method is simple to implement, and robust.  
 
+\subsection{FD schemes for the two dimensional heat equation}
 A detailed discussion on axi-symmetric heat equation is in [\ref{2017book}]. We model the heat equation to depend on the azimuth angle $\phi$, as trees in Washington state experience different sunlight and therefore growth in different direction. \textcolor{red}{pg.251, section 3.5.6}
 
 For simplicity of discussion, we assume $\rho,\ c, k$ are all constants. This is a reasonable assumption, as the trees should not have parameters that change drastically within the trunk. Then the constant coefficient equation \eqref{heat2d} simplifies to 
@@ -222,9 +225,24 @@ The specific scheme is
 \end{align}
 here $k_1,\ k_2,\ k_3$ are previously defined. 
 
+\subsection{FD schemes for the one dimensional heat equation}
 
+For the one dimensional heat equation, we apply centered-difference and Crank-Nicholson methods. 
 
-\subsection{Implementation in Python and numerical results}
+centered difference:
+$$(U^{n+1}_i - U^n_i)/k = 1/h^2 (U^n_{i-1} - 2U^n_i + U^n_{i+1})$$
+
+CN:
+$$(U^{n+1}_i - U^n_i)/k = 1/2 (D^2U^n_i + D^2U^{n+1}_i) 
+=1/2h^2(U^n_{i-1} - 2U^n_i + U^n_{i+1} + U^{n+1}_{i-1} - 2U^{n+1}_i + U^{n+1}_{i+1})$$   
+
+rewrite to be ($r=k/2h^2$)
+$$-r U^{n+1}_{i-1} + (1+2r) U^{n+1}_i - r U^{n+1}_{i+1} = 
+r U^n_{i-1} + (1-2r) U^n_i + r U^n_{i+1}$$
+
+\section{Implementation in Python and numerical results}
+\textcolor{red}{Record numerical results here}
+
 With the FTCD method, we need to worry about numerical stability. By the von Neumann stability analysis, we write $T(r,\phi, t_n)=e^{ikr+il\phi}$, and $T(r,\phi, t_{n+1})=Ge^{ikr+il\phi}$. We force $G\leq 1$. Plug $T(r,\phi, t_n)=T^0_{i,j}$ and $T(r,\phi, t_{n+1})=T^1_{i,j}$ into the Finite Difference equation, we get (we will temporarily denote $c=\frac{k}{\rho c}$)
 \begin{equation}
 G = c\Delta t \bigg[\frac{1}{(\Delta r)^2}(e^{-ik\Delta r}+e^{ik\Delta r}-2)+\frac{1}{2r_i\Delta r}(e^{ik\Delta r}-e^{-ik\Delta r})+\frac{1}{(r_i\Delta \phi)^2}(e^{-il\Delta \phi}+e^{il\Delta \phi}-2)\bigg]+1
