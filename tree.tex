@@ -102,16 +102,16 @@ In this work, we consider the numerical modeling of temperature distribution in 
 \end{enumerate}
 
 \section{PDE model of temperature within a tree trunk}
-Heat transfers witinin the tree trunk vertically, radially, and might differ at different at different azimuth angle. To fully model the temperature distribution within a tree trunk, we need to study the heat equation in three dimensions. 
+Heat transfers witinin the tree trunk vertically, radially, and might differ at different azimuth angle. To fully model the temperature distribution within a tree trunk, we need to study the heat equation in three dimensions. 
 \begin{equation}
-\rho c \frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\frac{1}{r}\frac{\partial}{\partial \phi}\bigg(\frac{k}{r}\frac{\partial T}{\partial \phi}\bigg)+\frac{\partial}{\partial z}\bigg(k\frac{\partial T}{\partial z}\bigg)+\text{ source term}\label{heat3d}
+\rho c \frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)+\text{ source term}=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\frac{1}{r}\frac{\partial}{\partial \phi}\bigg(\frac{k}{r}\frac{\partial T}{\partial \phi}\bigg)+\frac{\partial}{\partial z}\bigg(k\frac{\partial T}{\partial z}\bigg)+\text{ source term}\label{heat3d}
 \end{equation}
 However, for our application, we can greatly simplify the equation with reasonable assumptions. As our devices would be installed in forests with trees of similar age and growth, it is reasonable to assume that we install all devices at the same height- this eliminates the dependence on the height ($z$- variable). We therefore obtain the following standard heat equation for temperature distribution in two dimensional cylindrical coordinates:
 \begin{equation}
-\rho c\frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\frac{1}{r}\frac{\partial}{\partial \phi}\bigg(\frac{k}{r}\frac{\partial T}{\partial \phi}\bigg)\label{heat2d}
+\rho c\frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)+\text{ source term}=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\frac{1}{r}\frac{\partial}{\partial \phi}\bigg(\frac{k}{r}\frac{\partial T}{\partial \phi}\bigg)+\text{ source term}\label{heat2d}
 \end{equation}
 
-We add source terms for the diffusion equation to obtain
+We add details of source terms for the diffusion equation to obtain
 \begin{equation}
 \rho c\frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)-\frac{1}{\Delta r}[H+(1-\alpha)(S_{dir}+S_{dif})+(IR_{in}-IR_{out})]
 \end{equation}
@@ -148,9 +148,13 @@ Notations:
 \item $\phi$: azimuth angle, measured clockwise with south being $\phi=0$ (radian/degree), [\ref{heat}] assumes $\partial k/\partial \phi=0$
 \item $\alpha$: albedo of the surface
 \end{enumerate}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Furthur simplification to one dimensional equation}
-Although we will be working mostly with the above two dimensional heat equation, [\ref{heat}] provides justification for further reducing the above problem to one dimensional case. As seen in Fig. 2 of [\ref{heat}], biggest temperature difference occurs in south and west asepcts. In our hardware application, we seek to install our devices in the aspects with the highest temperature differences. Based on the location of Washington state \textcolor{red}{and data from hardware group}, we install all devices in the south of the tree trunks. This furthur reduces the heat equation to solve to a one dimensional problem. 
+Although we will be working mostly with the above two dimensional heat equation, [\ref{heat}] provides justification for further reducing the above problem to one dimensional case. As seen in Fig. 2 of [\ref{heat}], biggest temperature difference occurs in south and west asepcts. In our hardware application, we seek to install our devices in the aspects with the highest temperature differences. Based on the location of Washington state \textcolor{red}{and data from hardware group}, we install all devices in the south of the tree trunks. This furthur reduces the heat equation to solve to a one dimensional problem
+
+\begin{equation}
+\rho c\frac{\partial T}{\partial t}=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\text{ source term}=k\frac{1}{r}\frac{\partial T}{\partial r}+k\frac{\partial^2T}{\partial r^2}+\text{ source term}.\label{heat1d}
+\end{equation}
 
 In the following, we discuss the numerical simulation of both two and one dimensional heat equations with several numerical schemes. 
 
@@ -227,6 +231,8 @@ here $k_1,\ k_2,\ k_3$ are previously defined.
 
 \subsection{FD schemes for the one dimensional heat equation}
 
+\textcolor{red}{Discussion with Orlando: should we use $\rho c\frac{\partial T}{\partial t}=k\frac{1}{r}\frac{\partial T}{\partial r}+k\frac{\partial^2T}{\partial r^2}$ or $\rho c\frac{\partial T}{\partial t}=k\frac{\partial^2T}{\partial r^2}$}
+
 For the one dimensional heat equation, we apply centered-difference and Crank-Nicholson methods. 
 
 centered difference:
@@ -234,7 +240,9 @@ $$(U^{n+1}_i - U^n_i)/k = 1/h^2 (U^n_{i-1} - 2U^n_i + U^n_{i+1})$$
 
 CN:
 $$(U^{n+1}_i - U^n_i)/k = 1/2 (D^2U^n_i + D^2U^{n+1}_i) 
-=1/2h^2(U^n_{i-1} - 2U^n_i + U^n_{i+1} + U^{n+1}_{i-1} - 2U^{n+1}_i + U^{n+1}_{i+1})$$   
+=1/2h^2(U^n_{i-1} - 2U^n_i + U^n_{i+1} + U^{n+1}_{i-1} - 2U^{n+1}_i + U^{n+1}_{i+1})$$  
+
+\textcolor{red}{heat1D\_CNv2.py} 
 
 rewrite to be ($r=k/2h^2$)
 $$-r U^{n+1}_{i-1} + (1+2r) U^{n+1}_i - r U^{n+1}_{i+1} = 
