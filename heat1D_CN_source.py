@@ -64,6 +64,7 @@ def g0(t):
     return 0.005 * np.cos(t)
 
 
+# bdry condition at tree bark ~ source term?
 def g1(t):
     # gaussian(x, mu, sig)
     mu = 4 # start meansuring at 8 am, peak at 12
@@ -75,17 +76,22 @@ def g1(t):
 # %% define matrices in time stepping. eqn (9.9)
 tridiag = sparse.diags([-r, 1 + 2 * r, -r], [-1, 0, 1], shape=(m, m)).toarray()
 
-# %% main time stepping
 
 
 soln = []
+
+# IC
 U0 = eta(x)
+# Ax = b, this is the b ???
 rhs = r * np.roll(U0, -1) + (1 - 2 * r) * U0 + r * np.roll(U0, 1)
 rhs[0] = r * (g0(t0) + g0(t0 + k)) + (1 - 2 * r) * U0[0] + r * U0[1]
 rhs[-1] = r * (g1(t0) + g1(t0 + k)) + (1 - 2 * r) * U0[-1] + r * U0[-2]
 #############
 soln.append(U0)
 #print("soln for t = 0: " + str(soln));
+
+# %% main time stepping
+
 for i in range(n):
 #    print()
     U1 = np.linalg.solve(tridiag, rhs)  # sparse.linalg.lsqr(tridiag, rhs)
@@ -98,11 +104,13 @@ for i in range(n):
 
 soln_plot = np.asarray(soln)
 
+print(soln_plot.shape)
+
 print("max and min of soln at final step = ",np.max(soln_plot[-1,:]),np.min(soln_plot[-1,:]))
 
-#plt.plot(t, soln_plot[], '.r-')
-#plt.title('Solution of heat equation with Gaussian source term with time step: n=%i' %n)
-#plt.show()
+plt.plot(t, soln_plot[:,23], '.r-')
+plt.title('Solution of heat equation with Gaussian source term with time step: n=%i' %n)
+plt.show()
 
 """
 Test Gaussian: https://stackoverflow.com/questions/14873203/plotting-of-1-dimensional-gaussian-distribution-function
@@ -119,3 +127,5 @@ for mu, sig in [(-1, 1), (0, 2), (2, 3)]:
 
 plt.show()
 """
+
+## data for temp (July 2nd 2020): 12 am 58, 3am 56, 6am 56, 9am 58, 12pm 61, 3pm 61, 6pm 62, 9pm 60.
