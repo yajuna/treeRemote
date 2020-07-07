@@ -83,6 +83,7 @@ U0 = eta(x)
 rhs = r * np.roll(U0, -1) + (1 - 2 * r) * U0 + r * np.roll(U0, 1)
 rhs[0] = r * (g0(t0) + g0(t0 + k)) + (1 - 2 * r) * U0[0] + r * U0[1]
 rhs[-1] = r * (g1(t0) + g1(t0 + k)) + (1 - 2 * r) * U0[-1] + r * U0[-2]
+#############
 soln.append(U0)
 #print("soln for t = 0: " + str(soln));
 for i in range(n):
@@ -97,11 +98,11 @@ for i in range(n):
 
 soln_plot = np.asarray(soln)
 
-print("max and min of soln at final step = ",soln_plot.max,soln_plot.min)
+print("max and min of soln at final step = ",np.max(soln_plot[-1,:]),np.min(soln_plot[-1,:]))
 
-plt.plot(t, soln_plot[], '.r-')
-plt.title('Solution of heat equation with Gaussian source term with time step: n=%i' %n)
-plt.show()
+#plt.plot(t, soln_plot[], '.r-')
+#plt.title('Solution of heat equation with Gaussian source term with time step: n=%i' %n)
+#plt.show()
 
 """
 Test Gaussian: https://stackoverflow.com/questions/14873203/plotting-of-1-dimensional-gaussian-distribution-function
