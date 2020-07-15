@@ -7,7 +7,7 @@ Created on Fri Mar 27 12:47:12 2020
 
 Ref: LeVeque Chapter 9, pg 183
 
-u_t=ku_xx
+u_t=kappa*u_xx (with kappa = 1 WLOG)
 
 u(x,0)=eta(x)
 u(0,t)=g0(t)
@@ -92,7 +92,7 @@ soln.append(U0)
 
 # %% main time stepping
 
-for i in range(n):
+for i in range(n-1): # range changed based on mhockman7_7_20.py
 #    print()
     U1 = np.linalg.solve(tridiag, rhs)  # sparse.linalg.lsqr(tridiag, rhs)
     U0 = U1
@@ -108,8 +108,11 @@ print(soln_plot.shape)
 
 print("max and min of soln at final step = ",np.max(soln_plot[-1,:]),np.min(soln_plot[-1,:]))
 
-plt.plot(t, soln_plot[:,23], '.r-')
-plt.title('Solution of heat equation with Gaussian source term with time step: n=%i' %n)
+grid_point = 23
+plt.plot(t, soln_plot[:,grid_point], '.r-')
+plt.title('Temperature with Gaussian source term with time step n=%i, at grid point x=%i ' %(n,grid_point) )
+plt.xlabel('time')
+plt.ylabel('temperature distribution')
 plt.show()
 
 """

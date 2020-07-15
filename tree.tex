@@ -248,6 +248,14 @@ rewrite to be ($r=k/2h^2$)
 $$-r U^{n+1}_{i-1} + (1+2r) U^{n+1}_i - r U^{n+1}_{i+1} = 
 r U^n_{i-1} + (1-2r) U^n_i + r U^n_{i+1}$$
 
+\subsection{Discretization of the heat equation in 1D polar form}
+Consider the following equation:
+$$\rho c\frac{\partial T}{\partial t}=k\frac{1}{r}\frac{\partial T}{\partial r}+k\frac{\partial^2T}{\partial r^2}$$
+
+WLOG, we take $\rho c/k = 1$, and we use the CN-method for discretization:
+
+$$(T^{n+1}_i - T^n_i)/k = 1/(2r_ih)(T^n_{i+1}-T^n_i + T^{n+1}_{i+1}-T^{n+1}_i )+1/(2h^2)(T^n_{i-1} - 2T^n_i + T^n_{i+1} + T^{n+1}_{i-1} - 2T^{n+1}_i + T^{n+1}_{i+1})$$ 
+
 \section{Implementation in Python and numerical results}
 \textcolor{red}{Record numerical results here}
 

@@ -78,6 +78,7 @@ U0 = eta(x)
 rhs = r * np.roll(U0, -1) + (1 - 2 * r) * U0 + r * np.roll(U0, 1)
 rhs[0] = r * (g0(t0) + g0(t0 + k)) + (1 - 2 * r) * U0[0] + r * U0[1]
 rhs[-1] = r * (g1(t0) + g1(t0 + k)) + (1 - 2 * r) * U0[-1] + r * U0[-2]
+
 soln.append(U0)  # UPDATE 7/7/2020: This line acts like one loop of the for loop on line 83
 #print("soln for t = 0: " + str(soln));
 for i in range(n-1):  # UPDATE 7/7/2020: Because of line 81, range is (n-1) instead of n
