@@ -53,7 +53,7 @@ gamma = np.ones(m - 1)
 for j in range(1, gamma.size):
     gamma[j] = dt / (4 * a * r[j + 1] * dt) + 0.5 * beta
 #    print(r[j+1])
-gamma[0] = beta  # define neumann bdry condition 1st row
+#gamma[0] = beta  # define neumann bdry condition 1st row
 
 
 ######################################################################
