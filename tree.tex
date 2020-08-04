@@ -185,8 +185,8 @@ Here $T^n_{i,j} \approx T(r_i,\phi_j,t_n)$ denotes the numerical solution at the
 \frac{T^1_{i,j}-T^0_{i,j}}{\Delta t}=D\ T_{i,j},
 \end{equation}
 where the right hand side is a discretization in space, with $D$ being the difference operator. Depending on $D$, the above {\it continuous differential equation} can be discretized in the following two ways:
-\subsubsection{Forward in time, centered difference Method (FTCD)}
-The FTCD is the most straightforward method, where we directly apply the above listed discretization to the heat equation. 
+\subsubsection{Forward in time, centered difference Method (FTCS)}
+The FTCS is the most straightforward method, where we directly apply the above listed discretization to the heat equation. 
 \begin{align}
 T^1_{i,j}=& \frac{k\Delta t}{\rho c}\bigg[\underbrace{\frac{1}{(\Delta r)^2}\bigg(T^0_{i-1,j}+T^0_{i+1,j}-2T^0_{i,j}\bigg)}_{\frac{\partial^2T}{\partial r^2}}+\underbrace{\frac{1}{2r_i\Delta r}\bigg(T^0_{i+1,j}-T^0_{i-1,j}\bigg)}_{\frac{1}{r}\frac{\partial T}{\partial r}}\nonumber\\
 +& \underbrace{\frac{1}{r_i^2(\Delta \phi)^2}\bigg(T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}\bigg)}_{\frac{1}{r^2}\frac{\partial^2 T}{\partial \phi^2}}\bigg]+T^0_{i,j},
@@ -216,7 +216,7 @@ Space information at each time step.
 Imagine one more axis normal to the paper, pointing outwards above the blue dot. That would be $T^1_{i,j}$. 
 
 \subsubsection{Crank-Nicolson Method (CNM)}
-We also solve the heat equation with the Crank-Nicolson method, as it is easy to modify given the FTCD method. To put simply, the general scheme is modified by averaging the space information of the current step and the next step:
+We also solve the heat equation with the Crank-Nicolson method, as it is easy to modify given the FTCS method. To put simply, the general scheme is modified by averaging the space information of the current step and the next step:
 \begin{equation}
 \frac{T^1_{i,j}-T^0_{i,j}}{\Delta t}=\frac{1}{2}D\ T^0_{i,j}+\frac{1}{2}D\ T^1_{i,j}.
 \end{equation}
@@ -242,24 +242,116 @@ CN:
 $$(U^{n+1}_i - U^n_i)/k = 1/2 (D^2U^n_i + D^2U^{n+1}_i) 
 =1/2h^2(U^n_{i-1} - 2U^n_i + U^n_{i+1} + U^{n+1}_{i-1} - 2U^{n+1}_i + U^{n+1}_{i+1})$$  
 
-\textcolor{red}{heat1D\_CNv2.py} 
-
 rewrite to be ($r=k/2h^2$)
 $$-r U^{n+1}_{i-1} + (1+2r) U^{n+1}_i - r U^{n+1}_{i+1} = 
 r U^n_{i-1} + (1-2r) U^n_i + r U^n_{i+1}$$
 
 \subsection{Discretization of the heat equation in 1D polar form}
-Consider the following equation:
-$$\rho c\frac{\partial T}{\partial t}=k\frac{1}{r}\frac{\partial T}{\partial r}+k\frac{\partial^2T}{\partial r^2}$$
+The full IBVP we seek to solve is the following
+\begin{equation}
+\begin{cases} \rho c\frac{\partial T}{\partial t}=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg) + \frac{1}{\Delta r}g_s(t)\\
+\frac{\partial T(r,t)}{\partial r}\bigg|_{r=0} = 0,\ T(r,t)\bigg|_{r = R} = g_1(t)\\
+T(r,0) = \text{temperature in tree trunk at 7 am}
+\end{cases}
+\end{equation}
 
-WLOG, we take $\rho c/k = 1$, and we use the CN-method for discretization:
+Let $T^n_{i} \approx T(r_i,t_n)$ denote the numerical solution at the point $(r_i,t_n)$, $\Delta t$ the time step, and $\Delta r$ grid size. 
+With second order central difference in space 
+\begin{equation}\frac{\partial T}{\partial r}\approx\frac{T_{i+1}-T_{i-1}}{2\Delta r}\end{equation}
+\begin{equation}\frac{\partial^2 T}{\partial r^2}\approx\frac{T_{i-1}-2T_{i}+T_{i+1}}{(\Delta r)^2}\end{equation}
+and first order forward in time
+\begin{equation}\frac{\partial T}{\partial t}\approx\frac{T^1-T^0}{\Delta t},\end{equation}
+we obtain the Crank-Nicolson method by averaging the above spatial differences in time:
+\begin{align}
+&(T^{n+1}_i - T^n_i)/\Delta t = 1/(4ar_i\Delta r)(T^n_{i+1}-T^n_{i-1} + T^{n+1}_{i+1}-T^{n+1}_{i-1} )\nonumber\\
+&+1/(2a(\Delta r)^2)(T^n_{i-1} - 2T^n_i + T^n_{i+1} + T^{n+1}_{i-1} - 2T^{n+1}_i + T^{n+1}_{i+1}),\label{1dCNscheme}
+\end{align}
+where $a = \frac{\rho c}{k}$.
 
-$$(T^{n+1}_i - T^n_i)/k = 1/(2r_ih)(T^n_{i+1}-T^n_i + T^{n+1}_{i+1}-T^{n+1}_i )+1/(2h^2)(T^n_{i-1} - 2T^n_i + T^n_{i+1} + T^{n+1}_{i-1} - 2T^{n+1}_i + T^{n+1}_{i+1})$$ 
+We implement boundary conditions in the numerical scheme. For the boundary at the center of the tree, we follow the same no-flux Neumann condition in \ref{firestem2d}. We use the second order central difference approximation at $r=0$: 
+\begin{equation}
+    \frac{\partial T}{\partial r}\bigg|_{r=0}\approx \frac{T_2-T_0}{2\Delta r}=0.
+\end{equation} % should try with Dirichlet conditions as well, if more info of temperature is known. Our original modeling still makes sense: center temperature is const + small oscillation.
+Equation \eqref{1dCNscheme} gives a representation for the ghost cell value $T_0$ in terms of $T_2$. When implementing, we replace $T_0$ by $T_2$ in \label{1dCNscheme} when $i=1$. It is implemented in the first row of the matrix below. 
+
+For the outer boundary condition at the surface of the tree, we implement the source term from the previous section as a Dirichlet condition
+\begin{equation}
+    T(r,t)\bigg|_{surface}=g_1(t).
+\end{equation}
+We again introduce a ghost cell at $T_{M+1}$ in \label{1dCNscheme}, with $T^1_{M} = g_1(t)$, and $T^1_{M+1} = g_1(t+\Delta t)$.  
+It is inplemented the last row of the following matrix equation.
+
+The source term $g_s(t)$ is only present at the boundary. To discretize the source term, we have the following vector \ref{salsa}
+\begin{equation}
+G_s(t)=
+\begin{pmatrix}
+0\\
+0\\
+\vdots\\
+0\\
+g_s(t)
+\end{pmatrix}
+\end{equation}
+To match with the continuous problem, we multiply $G_s(t)$ by $\frac{\Delta t}{ak\Delta r}$. 
+
+
+Together, we solve the following system to compute the heat distribution in the tree trunk: % ref: a primer to PDEs, Salsa et al
+\begin{equation*}
+    \left( \begin{array}{cccc}
+1+\beta & -\beta & & 0\\
+\alpha_2 & 1+\beta & -\gamma_2 & \\
+\ddots& \ddots & \ddots  & \\
+& \alpha_{m-1} & 1+\beta & -\gamma_{m-1} \\
+0 & & \alpha_m & 1+\beta \end{array} \right)\left(\begin{array}{c}
+     T^1_1  \\
+     T^1_2 \\
+     \vdots\\
+     T^1_{m-1}\\
+     T^1_m
+\end{array}\right)=\end{equation*}
+\begin{equation}\left( \begin{array}{cccc}
+1-\beta & \beta & & 0\\
+-\alpha_2 & 1-\beta & \gamma_2 & \\
+\ddots& \ddots & \ddots  & \\
+& -\alpha_{m-1} & 1-\beta & \gamma_{m-1} \\
+0 & & -\alpha_m & 1-\beta \end{array} \right)\left(\begin{array}{c}
+     T^0_1  \\
+     T^0_2 \\
+     \vdots\\
+     T^0_{m-1}\\
+     T^0_m
+\end{array}\right)+\left(\begin{array}{c}
+     0  \\
+     0 \\
+     \vdots\\
+     0\\
+     rhs(M)
+\end{array}\right)
+\end{equation}
+where \begin{equation}rhs(M)=
+\gamma_m(g_1(t)+g_1(t+\Delta t))+\frac{\Delta t}{2ak\Delta r}(g_s(t)+g_s(t+\Delta t)),\nonumber\end{equation}
+$\alpha_i = \frac{\Delta t}{4ar_i\Delta t}-\frac{\Delta t}{2a(\Delta r)^2}$, $\beta = \frac{\Delta t}{a(\Delta r)^2}$, and $\gamma_i = \frac{\Delta t}{4ar_i\Delta t}+\frac{\Delta t}{2a(\Delta r)^2}$. %
+
+If the boundary condition is Neumann $$\frac{\partial T}{\partial r}\bigg|_{r=\text{ surface}} = g_1(t),$$ than the last row of above matrix equation should change to 
+
+\begin{equation}
+\begin{pmatrix}
+\vdots & & \vdots & \vdots\\
+0 & & -\beta &\ 1+\beta)\end{pmatrix}\begin{pmatrix}\vdots\\
+T^1_m\end{pmatrix}= \end{equation}
+\begin{equation}
+\begin{pmatrix}
+\vdots & & \vdots & \vdots\\
+0 & & \beta &\ 1+\beta)\end{pmatrix}\begin{pmatrix}\vdots\\T^0_m\end{pmatrix} +
+\begin{pmatrix}\vdots\\
+ rhs(M)\end{pmatrix}\end{equation}
+where \begin{equation}rhs(M)=
+2\Delta r\gamma_m(g_1(t)+g_1(t+\Delta t))+\frac{\Delta t}{2ak\Delta r}(g_s(t)+g_s(t+\Delta t)),\nonumber\end{equation}
 
 \section{Implementation in Python and numerical results}
 \textcolor{red}{Record numerical results here}
 
-With the FTCD method, we need to worry about numerical stability. By the von Neumann stability analysis, we write $T(r,\phi, t_n)=e^{ikr+il\phi}$, and $T(r,\phi, t_{n+1})=Ge^{ikr+il\phi}$. We force $G\leq 1$. Plug $T(r,\phi, t_n)=T^0_{i,j}$ and $T(r,\phi, t_{n+1})=T^1_{i,j}$ into the Finite Difference equation, we get (we will temporarily denote $c=\frac{k}{\rho c}$)
+With the FTCS method, we need to worry about numerical stability. By the von Neumann stability analysis, we write $T(r,\phi, t_n)=e^{ikr+il\phi}$, and $T(r,\phi, t_{n+1})=Ge^{ikr+il\phi}$. We force $G\leq 1$. Plug $T(r,\phi, t_n)=T^0_{i,j}$ and $T(r,\phi, t_{n+1})=T^1_{i,j}$ into the Finite Difference equation, we get (we will temporarily denote $c=\frac{k}{\rho c}$)
 \begin{equation}
 G = c\Delta t \bigg[\frac{1}{(\Delta r)^2}(e^{-ik\Delta r}+e^{ik\Delta r}-2)+\frac{1}{2r_i\Delta r}(e^{ik\Delta r}-e^{-ik\Delta r})+\frac{1}{(r_i\Delta \phi)^2}(e^{-il\Delta \phi}+e^{il\Delta \phi}-2)\bigg]+1
 \end{equation}
