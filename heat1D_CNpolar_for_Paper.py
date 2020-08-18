@@ -36,8 +36,8 @@ dr = r[1] - 0  # grid size
 dt = t[1] - t0  # time step
 
 ###
-
-a = 1.7/.12
+k = 0.12
+a = 1.7/ k
 
 # parameters defined as in paper
 beta = dt / (a * dr ** 2)
@@ -45,7 +45,8 @@ beta = dt / (a * dr ** 2)
 alpha = np.ones(m - 1)
 for j in range(alpha.size):
     alpha[j] = dt / (4 * a * r[j + 1] * dt) - 0.5 * beta
-#    print(r[j+1])
+# with heat flux bdry condition, last elt of alpha is -beta
+#alpha[-1] = -beta
 
 gamma = np.ones(m - 1)
 for j in range(1, gamma.size):
@@ -59,13 +60,13 @@ gamma[0] = beta  # define neumann bdry condition 1st row
 
 # initial condition being a small cos func
 def eta(r):
-    return 0.005 * np.cos(r)
+    return 0.005 * np.cos(r) + 273
 
 
 ## tree center bdry condition is homogeneous Neumann condition. In matrix
 
 
-# bdry condition at tree bark, with source term incorporated
+# bdry condition at tree bark, with source term incorporated as heat flux
 def g1(t):
     # gaussian(x, mu, sig)
 
@@ -88,17 +89,19 @@ soln = []
 U0 = eta(r)
 
 # %%
-#  Solving Ax1 = Bx0 + b, this is B. Need to modify bdry condition each step
+#  Solving Ax1 = Bx0 + b, this is B. No flux results in different last row from before
 
 B = sparse.diags([-alpha, np.ones(m) - beta, gamma], [-1, 0, 1], shape=(m, m)).toarray()
 
+
+
 soln.append(U0)
 
-# %% main time stepping`
+# %% main time stepping
 
 for i in range(n - 1):
     rhs = B.dot(U0)
-    rhs[-1] = rhs[-1] + (dt / (4 * a * r[-1] * dr) + 0.5 * beta) * (g1(i) + g1(i + 1))
+    rhs[-1] = rhs[-1] + (dt / (4 * a * r[-1] * dr) + 0.5 * beta) * (g1(i) + g1(i + 1)) * dr / k
     U1 = np.linalg.solve(tridiag, rhs)  # sparse.linalg.lsqr(tridiag, rhs)
     U0 = U1
     soln.append(U0)
@@ -114,6 +117,6 @@ print("max and min of soln at final step = ", np.max(soln_plot[-1, :]), np.min(s
 grid_point = 29
 plt.plot(t, soln_plot[:, grid_point], '.r-')
 plt.title('Temperature with combined source term at grid point r=%i ' % grid_point)
-plt.xlabel('Time (starting at 7 am)')
+plt.xlabel('Time since 7:00am (hrs)')
 plt.ylabel('Temperature Distribution')
 plt.show()

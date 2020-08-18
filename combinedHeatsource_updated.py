@@ -59,7 +59,7 @@ print(type(totalS))
 print(np.size(totalS))
 
 
-
+"""
 #  Uncomment if you want to see the plot
 plt.plot(x[:], totalS[:], "-g", label="south")
 plt.plot(x[:], totalN[:], "-b", label="north")
@@ -69,6 +69,7 @@ plt.xlabel("Time since 7:00am (hrs)")
 plt.ylabel("Energy flux $(W/m^2)$")
 plt.grid()
 plt.show()
+"""
 
 
 #  input: t0, the time at which the source term will be evaluated at
