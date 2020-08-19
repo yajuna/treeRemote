@@ -26,25 +26,26 @@ t = np.linspace(0, 12, 13)
 # currently set to be 10x the size of t
 x = np.linspace(0, 12, 1000)
 
-# interpolate temp data
+# interpolate temp data, length 1000
 
 tTemp = np.array(np.interp(x, t, T))
 
-
+"""
 plt.plot(x[:], tTemp[:], "-c", label="air temp")
 plt.axis([0,12,0,350])
 plt.legend()
 plt.xlabel("Time since 7:00am (hrs)")
 plt.ylabel("Air temp (kelvin)")
-plt.grid()
+#plt.grid()
 plt.show()
+"""
 
 
 def TacoTemp(t0):
     t0 = int(t0 / 0.012)
     return tTemp[t0]
 
-## to grab values
+## temperature of air at outer boundary                
 def TacomaTemp(i):
     return tTemp[i]
 
