@@ -12,10 +12,10 @@ import numpy as np
 albedo = .3  # "For albedo, we assumed a value of 0.3" - Potter Anderson page 3
 
 #  North variables
-insolationN = [28, 30, 29, 27, 26, 25, 26, 27, 28, 30, 28, 14, 0]  # IR_in-IR_out
-netInfN = [13, -9, -7, -2, -5, -7, -8, -6, -7, -14, -16, -28, -8]  # S_dir+S_dif
+insolationN = [28, 30, 29, 27, 26, 25, 26, 27, 28, 30, 28, 14, 0]  # S_dir+S_dif
+netInfN = [13, -9, -7, -2, -5, -7, -8, -6, -7, -14, -16, -28, -8]  # IR_in-IR_out
 convectionN = [13, -9, -7, -2, -5, -7, -8, -9, -16, -18, -33, -30, -22]  # H
-# conductionN = [15, -10, -8, -11, -8, -3, -1, -2, 1, 7, 20, 22, 20]  # k
+#conductionN = [15, -10, -8, -11, -8, -3, -1, -2, 1, 7, 20, 22, 20]  # measured quantity??
 totalN = []
 
 #  Make sure t = [0, 1, 2, ... , 12]
@@ -28,8 +28,9 @@ x = np.linspace(0, 12, 1000)
 
 #  interpolate the north data
 #  Also turn into an array so it sums how I want it to for totalN
-insolationNI = np.array(np.interp(x, t, insolationN))
-netInfNI = (1-albedo)*np.array(np.interp(x, t, netInfN))  # Scaled by (1-alpha)
+insolationNI = (1-albedo)*np.array(np.interp(x, t, insolationN))
+# Scaled by (1-alpha)
+netInfNI = np.array(np.interp(x, t, netInfN))  
 convectionNI = np.array(np.interp(x, t, convectionN))
 
 # Sum all the lines up
@@ -37,16 +38,16 @@ totalN = insolationNI + netInfNI + convectionNI
 
 
 #  South variables
-insolationS = [20, 180, 240, 330, 370, 390, 370, 330, 240, 180, 40, 30, 20]  # IR_in-IR_out
-netInfS = [0, -10, -15, -20, -25, -30, -25, -20, -18, -16, -14, -12, -6]  # S_dir+S_dif
+insolationS = [20, 180, 240, 330, 370, 390, 370, 330, 240, 180, 40, 30, 20] # S_dir+S_dif 
+netInfS = [0, -10, -15, -20, -25, -30, -25, -20, -18, -16, -14, -12, -6]  # IR_in-IR_out
 convectionS = [0, -10, -25, -30, -35, -40, -35, -30, -28, -22, -18, -12, -6]  # H
-# conductionS = [0, -100, -150, -190, -195, -200, -180, -130, -80, -30, -28, -10, -6]  # k
+#conductionS = [0, -100, -150, -190, -195, -200, -180, -130, -80, -30, -28, -10, -6]  # measured quantity??
 totalS = []
 
 #  interpolate the south data
 #  Also turn into an array so it sums how I want it to for totalS
-insolationSI = np.array(np.interp(x, t, insolationS))
-netInfSI = (1-albedo)*np.array(np.interp(x, t, netInfS))  # Scaled by (1-alpha)
+insolationSI = (1-albedo)*np.array(np.interp(x, t, insolationS))
+netInfSI = np.array(np.interp(x, t, netInfS))  # Scaled by (1-alpha)
 convectionSI = np.array(np.interp(x, t, convectionS))
 
 # Sum all the lines up
@@ -68,6 +69,7 @@ plt.legend()
 plt.xlabel("Time since 7:00am (hrs)")
 plt.ylabel("Energy flux $(W/m^2)$")
 plt.grid()
+plt.savefig('/home/yajun/Documents/treePower/combinedHeatSource.eps', format='eps', dpi=300)
 plt.show()
 """
 

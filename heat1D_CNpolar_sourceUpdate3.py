@@ -77,7 +77,7 @@ def g1(t):
 def gs(t):
     # gaussian(x, mu, sig)
 
-    return sourceTermsNvalue(t)
+    return sourceTermsSvalue(t)
 
 
 #######################################################################
@@ -125,10 +125,16 @@ print(soln_plot.shape)
 
 print("max and min of soln at final step = ", np.max(soln_plot[-1, :]), np.min(soln_plot[-1, :]))
 
-grid_point = 29
+grid_point = 18
+
+##selecting the current axis
+#ax = plt.gca()
+##sets the ratio to 0.2  
+#ax.set_aspect(0.2)
 plt.plot(t, soln_plot[:, grid_point], '.r-')
 plt.title('Temperature with combined source term at grid point r=%i ' % grid_point)
-plt.axis([0,12,273,300])
+plt.axis([0,12,280,350])
 plt.xlabel('Time since 7:00am (hrs)')
 plt.ylabel('Temperature Distribution (K)')
+plt.savefig('/home/yajun/Documents/treePower/tempS18.eps', format='eps', dpi=300,bbox_inches='tight')
 plt.show()
