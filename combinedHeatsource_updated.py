@@ -47,7 +47,8 @@ totalS = []
 #  interpolate the south data
 #  Also turn into an array so it sums how I want it to for totalS
 insolationSI = (1-albedo)*np.array(np.interp(x, t, insolationS))
-netInfSI = np.array(np.interp(x, t, netInfS))  # Scaled by (1-alpha)
+# Scaled by (1-alpha)
+netInfSI = np.array(np.interp(x, t, netInfS))  # 
 convectionSI = np.array(np.interp(x, t, convectionS))
 
 # Sum all the lines up
