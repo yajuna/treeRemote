@@ -20,7 +20,7 @@ stability to test; standard heat equation CN stable for any dt>0. Take dt = O(dr
 import numpy as np
 from scipy import sparse
 from matplotlib import pyplot as plt
-from combinedHeatsource_updated import * # source term at bdry
+from combinedHeatsource_update1 import * # source term at bdry
 from Temp_dataVec import * # boundary at tree bark
 
 # number of grid points, space grid points r.
@@ -133,8 +133,8 @@ grid_point = 38
 #ax.set_aspect(0.2)
 plt.plot(t, soln_plot[:, grid_point], '.r-')
 plt.title('Temperature with combined source term at grid point r=%i ' % grid_point)
-plt.axis([0,12,280,330])
+plt.axis([0,12,280,305])
 plt.xlabel('Time since 7:00am (hrs)')
 plt.ylabel('Temperature Distribution (K)')
-plt.savefig('/home/yajun/Documents/treePower/tempN38new.eps', format='eps', dpi=300,bbox_inches='tight')
+plt.savefig('/home/yajun/Documents/treePower/tempN38new1.eps', format='eps', dpi=300,bbox_inches='tight')
 plt.show()
