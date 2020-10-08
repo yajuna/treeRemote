@@ -19,6 +19,9 @@ import numpy as np
 from pylab import *
 from sunPosition import sunpos
 from datetime import datetime
+import pytz
+from pysolar.solar import *
+from Gaussian import sourceTerms as curve # not sure what this does anymore
 
 
 #%% Initial conditions for source vars
@@ -28,6 +31,10 @@ T_in = 1            #Temperature of tree interior (K)
 k = 1               #Thermal conductivity (W/(m*K))
 T_sfc = 1           #Temperature of tree surface (K)
 T_air = 1           #Temperature of surrounding air (K)
+
+
+T_air = curve(0)
+
 L = 1               #Vertical height (m)
 R = 0.09            #Tree radius (m)
 theta1 = np.pi      #Difference between wind direction and the aspect of the surface point (radians)
@@ -47,8 +54,8 @@ phi_0 = 0
 R = 0.09
 L = 2.4
 alpha = 0.3
-LAT = 40.015
-LON = -105.27
+latitude_deg = 40.015
+longitude_deg = -105.27
 tau = 0.78
 nu = 0.80
 ro = 686
@@ -61,7 +68,7 @@ def convectiveHeatLoss():
         theta = theta1 
     else: 
         theta = 2 * np.pi
-    h_free = 18.293 * abs(T_sfc - T_air) / (L * T_air**3)**0.25 * (T_air + 97.77) / math.sqrt(179.02 + T_air)
+    h_free = 18.293 * abs(T_sfc - T_air) / (L * T_air**3)**0.25 * (T_air + 97.77) / np.math.sqrt(179.02 + T_air)
     h_forced = 3.458 * (T_air + T_sfc - 0.74)**0.49 * (u / (R * T_air))**0.5 * (1 - (theta / 90)**3)
     h = h_free + h_forced
     H = h * (T_sfc - T_air) 
@@ -76,55 +83,26 @@ def longWaveRadiation():
     IR = IR_in - IR_out
     return IR
 
+def solarRadiationHeating():
+    date = pytz.timezone('America/Vancouver').localize(datetime.datetime.now())
+    altitude_deg = get_altitude(latitude_deg, longitude_deg, date)
+    radiation = pysolar.solar.radiation.get_radiation_direct(date, altitude_deg)
+    return radiation
 
- #%% Calculate angle of incidence i 
-def solarRadiationHeating(phi):
-    # at the current time
-    now = datetime.utcnow()
-    # solar azimuth and zenith angles
-    #az,zen = sunpos(now,LAT,LON,0)[:2] #discard RA, dec, H
-    az, zen = sunpos(now,LAT,LON,0)[:2]
-    # convert azimuth and zenith values from degrees to radians
-    Z = radians(zen)
-    # solar constant
-    S_0 = 1368 
-    # albedo of surface (disregarding this for now)
-    alpha = 0
-    
-    # phi = 0 
-    """PLACEHOLDER """
-    
-    # angle of incidence
-    i = abs(az-phi)
-    
-    if (i > pi/2):
-        S_dir = 0
-    else:
-        S_dir = S_0 * tau**(1 / math.cos(Z)) * math.cos(i)    
-    S_dif = S_0 * math.cos(Z) / 3 * (1 + math.cos(Z)) * (eta - (tau)**(1 / math.cos(Z)))
-    S = (S_dir + S_dif)*(1 - alpha)
-    return S
-
-def sourceTerms(atSurface, phi):
+def sourceTerms(atSurface):
     if (atSurface):
         H = convectiveHeatLoss()
-        S = solarRadiationHeating(phi)
+        S = solarRadiationHeating()
         IR = longWaveRadiation()
         tot = H + S + IR
+        print(H, S, IR)
     else:
         tot = 0
     return tot
 
-
-
 # Main function for testing output 
-"""
-
 def main():
-    disp(total(0))
-    return 0
+    sourceTerms(atSurface=True)
 
 if __name__ == "__main__":
     main()
-   
-"""
