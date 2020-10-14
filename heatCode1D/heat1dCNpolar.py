@@ -33,7 +33,7 @@ from sourceS import * # source term at bdry
 from Temp_dataVec import * # boundary at tree bark
 #%%
 config = dict()
-config['gridPoints'] = 500
+config['gridPoints'] = 50
 config['timeSteps'] = 1000
 config['thermalConductivity'] = 0.12
 config['heatCapacity_rhoc'] = 1.7

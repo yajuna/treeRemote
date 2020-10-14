@@ -16,9 +16,9 @@ from sourceS import * # source term at bdry
 from Temp_dataVec import * # boundary at tree bark
 #%%
 config = dict()
-config['gridPoints'] = 500
+config['gridPoints'] = 50
 config['timeSteps'] = 1000
-config['thermalConductivity'] = 0.12 * np.ones(6)
+config['thermalConductivity'] = [0.12,0.24,1,0.5,1.2,0.8]
 config['heatCapacity_rhoc'] = 1.7
 config['at_point'] = 38
 #%%
@@ -26,6 +26,7 @@ def temp(config):
     m = config['gridPoints']
     n = config['timeSteps']
     k = config['thermalConductivity']
+    k = np.asarray(k)
     rhoc = config['heatCapacity_rhoc']
     at_point = config['at_point'] 
     
@@ -45,9 +46,10 @@ def temp(config):
         beta[j] = dt / (a[j] * dr ** 2)
 
     alpha = np.ones(m - 1)
-    for j in range(alpha.size):
+    for j in range(alpha.size - 1):
         alpha[j] = dt / (4 * a[j + 1] * r[j + 1] * dr) - 0.5 * beta[j + 1] + dt / (4 * dr ** 2) * (1. / a[j + 2] - 1. / a[j])
-    alpha[-1] = dt / (4 * a[j + 1] * r[j + 1] * dr) - 0.5 * beta[j + 1] + dt / (4 * dr ** 2) * (1. / a[j + 2] - 1. / a[j])  
+    # last alpha value separately defined, with different approximation for dk/dr, reflected on index of a
+    alpha[-1] = dt / (4 * a[-1] * r[-1] * dr) - 0.5 * beta[-1] + dt / (2 * dr ** 2) * (1. / a[-1] - 1. / a[-2])  
 # use following for neumann condition at outer boundary
 # alpha[-1] = -beta
 
@@ -68,8 +70,8 @@ def temp(config):
     for i in range(n - 1):
         rhs = B.dot(U0)
     # dirichlet bdry condition with g1, source at bdry with gs; average gs at time i and i + 1
-        rhs[-1] = rhs[-1] + (dt / (4 * a * r[-1] * dr) + 0.5 * beta) * (g1(i) + g1(i + 1)) + dt/(2*a*dr*k)*(gs(i) + gs(i + 1))
-
+        rhs[-1] = rhs[-1] + gamma[-1] * (g1(i) + g1(i + 1)) + dt/(2 * a[-1] * dr * k[-1]) * (gs(i) + gs(i + 1))
+ 
     # if neumann condition for g1(t)
     # rhs[-1] = rhs[-1] + 2* dr *(dt / (4 * a * r[-1] * dr) + 0.5 * beta) * (g1(i) + g1(i + 1)) + dt/(2*a*dr*k)*(gs(i) + gs(i + 1))
         U1 = np.linalg.solve(tridiag, rhs)  # sparse.linalg.lsqr(tridiag, rhs)
