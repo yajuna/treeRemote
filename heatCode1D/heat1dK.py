@@ -10,7 +10,7 @@ modified from heat1dCNpolar.py, incorporate variable thermal conductivity.
 import numpy as np
 from scipy import sparse
 from matplotlib import pyplot as plt
-
+from mpl_toolkits.mplot3d import Axes3D # matplotlib version 3.1.0
 # import source terms and bdry conditions
 from sourceS import * # source term at bdry
 from Temp_dataVec import * # boundary at tree bark
@@ -18,9 +18,11 @@ from Temp_dataVec import * # boundary at tree bark
 config = dict()
 config['gridPoints'] = 50
 config['timeSteps'] = 1000
-config['thermalConductivity'] = [0.12,0.24,1,0.5,1.2,0.8]
+mu,sigma = 1, 0.001 # mean and standard deviation
+config['thermalConductivity'] = 0.12*np.random.normal(mu, sigma, 6)
 config['heatCapacity_rhoc'] = 1.7
 config['at_point'] = 38
+config['time'] = np.linspace(0, 1000, 50, endpoint = False)
 #%%
 def temp(config):
     m = config['gridPoints']
@@ -29,6 +31,10 @@ def temp(config):
     k = np.asarray(k)
     rhoc = config['heatCapacity_rhoc']
     at_point = config['at_point'] 
+    
+    time = config['time']
+    timeInt = time.astype(int)
+    timelist = timeInt.tolist()
     
     r = np.linspace(0, 1, m, endpoint=False)
     t = np.linspace(0, 12, n, endpoint=False)
@@ -84,16 +90,37 @@ def temp(config):
 #    print(soln_plot.shape)
     print("max and min of soln at ", at_point, " = ", np.max(soln_plot[:, at_point]), np.min(soln_plot[:, at_point]))
     
-#%% visualize
-    plt.plot(t, soln_plot[:, at_point], '.r-')
-    plt.title('Temperature with combined source term at grid point r=%i ' % at_point)
-    plt.axis([0,12,280,305])
-    plt.xlabel('Time since 7:00am (hrs)')
-    plt.ylabel('Temperature Distribution (K)')
-    plt.savefig('/home/yajun/Documents/treePower/figs/' + 'StempK' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')
+##%% visualize
+#    plt.plot(t, soln_plot[:, at_point], '.r-')
+#    plt.title('Temperature with combined source term at grid point r=%i ' % at_point)
+#    plt.axis([0,12,280,305])
+#    plt.xlabel('Time since 7:00am (hrs)')
+#    plt.ylabel('Temperature Distribution (K)')
+#    plt.savefig('/home/yajun/Documents/treePower/figs/' + 'StempK' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')
+#    plt.show()
+#
+#    return np.max(soln_plot[-1, :]), np.min(soln_plot[-1, :])
+
+#%% 3D visualization, plot a wireframe.
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    X, Y = np.meshgrid(r, timelist)
+    solnFig = soln_plot[timelist, :]
+#    zs = np.array([solnFig for r, timelist in zip(np.ravel(X), np.ravel(Y))])
+    Z = solnFig.reshape(X.shape)
+
+    ax.plot_wireframe(X, Y, Z, rstride=1, cstride=1)
+
+    ax.set_xlabel('Radius grid')
+    ax.set_ylabel('Time step')
+    ax.set_zlabel('Temperature (K)')
+
+    ax.set_title('Temperature distribution')
+#    plt.savefig('/home/yajun/Documents/treePower/figs/' + 'Stemp' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')
     plt.show()
 
-    return np.max(soln_plot[-1, :]), np.min(soln_plot[-1, :])
+    return soln_plot
 ######################################################################
 # %% define bdry and initial conditions. 
 
