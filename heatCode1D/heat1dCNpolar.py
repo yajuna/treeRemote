@@ -126,7 +126,7 @@ def temp(config):
 #    plt.savefig('/home/yajun/Documents/treePower/figs/' + 'Stemp' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')
     plt.show()
 
-    return np.max(soln_plot[-1, :]), np.min(soln_plot[-1, :])
+    return soln_plot
 ######################################################################
 # %% define bdry and initial conditions. 
 
