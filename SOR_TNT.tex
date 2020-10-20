@@ -1,0 +1,203 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath, amsthm, ulem, graphicx, marvosym, fancyhdr, amscd, amssymb, mathrsfs,color,subcaption,nicefrac,hyperref}
+\usepackage{framed}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing,angles,quotes}
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;} 
+\usepackage[inline]{showlabels}
+\usepackage{multicol}
+
+\newcommand\Z{{\mathbb Z}}
+\newcommand\F{{\mathbb F}}
+\newcommand\N{{\mathbb N}}
+\newcommand\bE{{\mathbf E}}
+\newcommand\p{{\mathscr P}}
+\newcommand\R{{\mathbb R}}
+\newcommand\Q{{\mathbb Q}}
+
+\tikzset{every label/.style={font=\footnotesize,inner sep=1pt}}
+\newcommand{\stencilpt}[4][]{\node[circle,fill,draw,inner sep=1.5pt,label={above left:#4},#1] at (#2) (#3) {}}
+
+
+\topmargin -.5in
+\evensidemargin-.3in
+\oddsidemargin-.3in
+\textheight 9.5in
+\textwidth 7in
+
+\newtheorem*{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{prop}{Proposition}
+\newtheorem{cor}{Corollary}
+
+
+%\setlength{\voffset}{-1in}
+
+\everymath={\displaystyle}
+
+%%% 
+% Framed mini-page environment 
+%%%
+\newsavebox{\fmbox}
+   \newenvironment{ans}
+     {\begin{lrbox}{\fmbox}\begin{minipage}{13cm} \textbf{Answer:} \par}
+     {\end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}} \vspace{0.25cm}}
+
+\newcommand{\lcm}{\operatorname{lcm}}
+\newcommand{\ds}{\displaystyle}
+
+%\pagestyle{fancy}
+
+\renewcommand{\headrulewidth}{0pt}
+%\rhead{}
+%\lhead{}
+%\cfoot{\Huge\Stopsign}
+
+\pagestyle{empty}
+
+\title{Research statement of numerical simulation group}
+
+
+\author{Yajun An\thanks{University of Washington, WA} %\and author\thanks{institue2} 
+\and Orlando Baiocchi \footnotemark[1]
+\and Heather Dillon\footnotemark[1]
+\and Michael Hockman\footnotemark[1]
+\and Selina Teng\footnotemark[1]}
+
+\begin{document}
+
+\maketitle
+
+%\noindent ABSTRACT. 
+
+%\vspace{1cm}
+
+%\noindent Key words: 
+
+
+\section*{Introduction}  
+The deployment of sensor networks in remote natural areas is a challenge regarding the energy requirements of the sensors themselves and the transmission systems. Since the use of batteries is both inconvenient and environmentally unfriendly, alternative processes have been considered. In particular, energy harvesting from trees is a potential candidate.
+
+To harvest energy, we use a thermoelectric generator attached to a metal rod, which is driven laterally through the tree stem. Although they are less efficient than heat engines, thermoelectric generators (TEGs) are preferred in remote applications that only require low power, which suits the relatively low output expected from natural heat sources such as trees [\ref{souza}]. The use of tree stems as a heat source for TEGs is promising because it is a long-lasting, maintenance-free energy source, suitable for powering local wireless devices, such as environmental sensors. Our group hypothesizes that the a crucial element of the TEG system is the way in which the temperature of the interior of the tree is brought into contact with the TEG.
+
+Healthy trees maintain a temperature of approximately 21.4 degrees Celsius in the leaves as a precondition for photosynthesis [\ref{treeleaf}]. In order to thermoregulate, the tree stores a substantial amount of heat in its stem or trunk. The annual rings in a tree trunk can thus be treated as isothermal sub-volumes. Reference [\ref{souza}] asserts that the temperature gradient between any annual ring and the external temperature is either approximately constant or varies with some time-delay as the external temperature varies. 
+
+In this project, we study several mathematical models simulating the temperature distribution in tree trunks with partial differential equations (PDEs) and their numerical solutions, with the purpose of examining the efficacy of trees for energy harvesting. Our result should provide reference for hardware analysis, particularly, giving insight to the magnitude of voltage possible for the thermoelectric devices.
+
+%\ref{potter_andresen} presented an earlier 2D model to simulate tree temperature distributions, driven by the influences of solar radiation, infrared emission and absorption, convection, and conduction. Their numerical solutions were obtained by a Finite Difference (FD) scheme, with centered differencing in space, and leapfrog in time. Another 2D temperature distribution model for tree trunks, FireStem2D, has been created by \ref{firestem2d}. FireStem2D has parameters for studying the effects of forest fires on tree stem injury, whereas the present paper examines the temperature of trees in ambient conditions. 
+
+%In order to utilize the small amount of energy obtained from the trees, it is important to know the heat distribution inside the trees as a function of the nature of the trees, the solar radiation, and the specific characteristics of the environment in which the harvesting takes place. That is the purpose of this project, which uses mathematical modeling and simulation of the conversion of heat into electricity via the Seebeck effect. 
+
+So far, we have set up a simplified 1D PDE model that describes the temperature distribution throughout the day in tree trunks along the radial direction [\ref{1Dtree}]. Since the COVID-19 pandemic has impacted our plans to collect field data in Washington State for our model, our 1D model is based on toy data presented in [\ref{potter_andresen}]. 
+
+We aim to complete the following tasks for this project:
+\begin{enumerate}
+\item Improve our current 1D model by adjusting the parameters, and adjusting the modeling of source terms. We compare the simulated data with collected data to validate our model.
+\item Expand our model to higher dimensions, finding the best direction and height to harvest energy. 
+\item Study the numerical solutions to the thermalelectric equations and provide a estimate of the voltage generated by the energy harvesting. 
+\end{enumerate}
+
+
+%In the next section, we justify the simplification obtained by reducing the dimensions from 3D to 2D, then to 1D). We follow the source terms used in Potter and Andresen model  \ref{potter_andresen}. In handling heat source, we treat the heat flux as the only source and solve a boundary value problem from the converted temperature condition. We apply a homogenous Neumann condition at the center of the tree trunk \ref{firestem2d}, and a nonhomogenous Dirichlet condition at the bark surface. We solve the differential equation in one dimension numerically using the Crank-Nicolson method, which is superior to explicit methods in its stability, thereby reducing the computation cost. 
+
+\section{Task 1: Improve current 1D model}
+The goal of this taks is to improve our current simplified model, so that we can use it as a reference for future higher dimensional models. 
+\subsection{Adjust parameters in model and sensitivity analysis}
+Currently, all the parameters in our model are constant. We plan to adjust the parameters so that they are not necessarily homogeneous with respect to radius, as several of the parameters vary according to the moisture content of the tree trunk. We perform the sensitivity analysis of modified model with variable parameter, and adjust our choices of parameters.
+
+
+\subsection{Improve source terms modeling}
+Currently, our source terms are modeled based on [\ref{potter_andresen}]. We plan to modify the source terms to fit the environment in Washington state. In particular, we are improving the model of surface heat convection, and incorporating solar radiation term specific to the Washington area.
+
+
+\subsection{Validate model by comparing simulated data with collected data}
+After we have built a more realistic model for Washington are, we would be comparing our simulated temperature data with the collected experiment data by our hardware group. This should validate our numerical simulations, or provide guidance for improvements.
+
+
+\section{Task 2: Expansion of model to higher dimensions}
+Currently, our 1D model only considers temperature variation as a function of radius. We have assumed that all TEG devices would be installed at the same height, and in the same direction. But to optimize energy harvesting, we would like to study the best height, direction, as well as depth of installation. Hence we aim to study the temperature distribution in the full 3D tree trunk model. 
+
+\subsection{Expand the temperature model to 2D}
+We incorporate height variable $z$ into the temperature model, and take temperature variation caused by vertical tree sap flow into consideration. We will modify the source terms, as well as boundary conditions in our model.
+
+\subsection{Expand the temperature model to 3D}
+We further incorporate angle variable $\phi$ into the model, and model the temperature distribution as a function of, radius, height, and angle. We will need to modify the source terms, and boundary conditions to expand them to three dimensions.
+
+\section{Task 3: Solution to the thermalelectric equations}
+We compute the numerical solution to the thermalelectric equations to give theoretical estimate of possible voltage generated by energy harvesting. 
+
+
+\section*{Evaluation and timeline}
+The success of these tasks will be measured by the accuracy of temperature modeling. \textcolor{red}{To coordinate with Hee-Seok's timeline}
+
+\begin{center}
+ \begin{tabular}{||c c c c c||} 
+ \hline
+ Task & month 1 & month 2 & month 3 & month 4\\ [0.5ex] 
+ \hline\hline
+ 1.1 & \checkmark &   &   & \\ 
+ \hline
+ 1.2 & \checkmark & & & \\
+ \hline
+ 1.3 &  & \checkmark & \checkmark & \\
+ \hline
+ 2.1 & & \checkmark & \checkmark & \\
+\hline
+ 2.2 & & &  & \checkmark\\
+ \hline
+ 3 & & & & \checkmark\\ [1ex] 
+ \hline
+\end{tabular}
+\end{center}  
+
+\section*{Funding requests}
+Our group would like to request the following funding.
+
+\begin{itemize}
+\item Summer stipend for Yajun An: \$ 7933.3/month
+
+\item Hourly pay for Michael Hockman from November 2020-August 2021: \$ 16.99/hours, 20 hours/week till June, 40 hours/week July-August
+
+\item Hourly pay for Selina Teng from November 2020-August 2021: \$ 16.99/hours, 20 hours/week till June, 40 hours/week July-August
+\end{itemize}
+
+\newpage
+\section*{References}
+\begin{enumerate}%[label={[\arabic*]}]
+
+\item B. R. Helliker and S. L. Richter, “Subtropical to boreal convergence of tree-leaf temperatures,” Nature, vol. 454, July 2008. [Online.] Available: Academic OneFile, http://find.galegroup.com. [Accessed July 21, 2020]. \label{treeleaf}
+
+\item P. Souza, F. Carvalho, F. Silva, H. Andrade, N. Silva, O. Baiocchi, and I. Müller, “On Harvesting Energy from Tree Trunks for Environmental Monitoring,” International Journal of Distributed Sensor Networks, pp. 1-9, 2016. \label{souza}
+
+\item B. E. Potter and J. A. Andresen, “A Finite-Difference Model of Temperatures and Heat Flow within a Tree Stem,” Canadian Journal of Forest Research, vol. 32, no. 3, pp. 548–555, 2002.\label{potter_andresen}
+
+\item Y. An, O. Baiocchi, M. Hockman, and S. Teng, "Computational model for temperature in tree trunk for energy harvesting," 2020 IEEE International IOT, Electronics and Mechatronics Conference (IEMTRONICS), Vancouver, BC, Canada, 2020, pp. 1-6, 
+
+doi: 10.1109/IEMTRONICS51293.2020.9216373.\label{1Dtree}
+
+%\item  E. K. Chatziefstratiou, et al., “FireStem2D – A Two-Dimensional Heat Transfer Model for Simulating Tree Stem Injury in Fires,” PLoS ONE, vol. 8, no. 7, p.e70110, July 2013.\label{firestem2d}
+
+%\item W. Simpson, A. TenWolde, “Physical properties and moisture relations of wood,” in \textit{ Wood handbook: wood as an engineering material}, Madison, WL: USDA Forest Service, Forest Products Laboratory, 1999, General technical report FPL, GTR-113: pp. 3.1-3.24\label{parameter} 
+
+%\item S. Linge, H. P. Langtangen, “Diffusion Equations,” in \textit{Finite Difference Computing with PDEs}, vol. 6, 1st ed. Springer, 2017, ch.3, pp. 207-322.\label{2017book}
+
+%\item R. J. LeVeque, \textit{ Finite difference methods for ordinary and partial differential equations}, SIAM, 2007\label{leveque} 
+
+%\item D. Yan, F. P. Dawson, M. Pugh, and A. A. El-Deib, “Time-Dependent Finite-Volume Model of Thermoelectric Devices,” IEEE Transactions on Industry Applications, vol. 50, no. 1, pp. 600-608, 2014.\label{thermoelectric}
+
+% The following sources are not cited in text (yet)
+
+% \item W. Bownman, “Sapwood temperature gradients between lower stems and the crown do not influence estimates of stand-level stem CO2 efflux,” Tree Physiology, vol. 28, no. 10, pp. 1553-1559, August 2008. [Online]. Available: https://academic.oup.com/treephys/article/28/10/1553/1647174. [Accessed July 21, 2020].\label{sapwood}
+
+% \item J. Chen, J. F. Franklin, T. A. Spies, “An empirical model for predicting diurnal air-temperature gradients from edge into old-growth Douglas-fir forest,” Ecological Modeling, vol. 67, no. 2, pp. 179-198, 1993.\label{airtempforest}
+
+% \item S. Tanja, et al., “Air temperature triggers the recovery of evergreen boreal forest photosynthesis in spring,” Global Change Biology, vol. 9, pp. 1410-1426, 2003.\label{evergreen}
+
+ 
+
+
+\end{enumerate}
+
+
+\end{document}
