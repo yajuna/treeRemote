@@ -2,10 +2,11 @@
 
 \usepackage{amsmath, amsthm, ulem, graphicx, marvosym, fancyhdr, amscd, amssymb, mathrsfs,color,subcaption,nicefrac,hyperref}
 \usepackage{framed}
+\usepackage{tabularx}
 \usepackage{tikz}
 \usetikzlibrary{decorations.pathreplacing,angles,quotes}
 \def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;} 
-\usepackage[inline]{showlabels}
+%\usepackage[inline]{showlabels}
 \usepackage{multicol}
 
 \newcommand\Z{{\mathbb Z}}
@@ -103,8 +104,9 @@ We aim to complete the following tasks for this project:
 
 \section{Task 1: Improve current 1D model}
 The goal of this taks is to improve our current simplified model, so that we can use it as a reference for future higher dimensional models. 
+
 \subsection{Adjust parameters in model and sensitivity analysis}
-Currently, all the parameters in our model are constant. We plan to adjust the parameters so that they are not necessarily homogeneous with respect to radius, as several of the parameters vary according to the moisture content of the tree trunk. We perform the sensitivity analysis of modified model with variable parameter, and adjust our choices of parameters.
+Currently, all the parameters in our model are constant. We plan to adjust the parameters so that they are not necessarily homogeneous with respect to radius, as several of the parameters vary according to the moisture content of the tree trunk. We perform the sensitivity analysis of modified model with variable parameter, and adjust our choices of parameters. We will also be conducting grid resolution study to improve efficiency of our simulations.
 
 
 \subsection{Improve source terms modeling}
@@ -113,6 +115,8 @@ Currently, our source terms are modeled based on [\ref{potter_andresen}]. We pla
 
 \subsection{Validate model by comparing simulated data with collected data}
 After we have built a more realistic model for Washington are, we would be comparing our simulated temperature data with the collected experiment data by our hardware group. This should validate our numerical simulations, or provide guidance for improvements.
+
+ 
 
 
 \section{Task 2: Expansion of model to higher dimensions}
@@ -129,27 +133,28 @@ We compute the numerical solution to the thermalelectric equations to give theor
 
 
 \section*{Evaluation and timeline}
-The success of these tasks will be measured by the accuracy of temperature modeling. \textcolor{red}{To coordinate with Hee-Seok's timeline}
+The success of these tasks will be measured by the accuracy of temperature modeling. %\textcolor{red}{To coordinate with Hee-Seok's timeline}
 
+{\footnotesize
 \begin{center}
- \begin{tabular}{||c c c c c||} 
+ \begin{tabular}{|c | c c c c c c c c c c c c|}
  \hline
- Task & month 1 & month 2 & month 3 & month 4\\ [0.5ex] 
+ Task (by month) &  1 & 2 & 3 & 4 & 5&  6&  7& 8&  9& 10& 11& 12\\ [0.5ex] 
  \hline\hline
- 1.1 & \checkmark &   &   & \\ 
+ 1.1 & \checkmark & \checkmark  &   &  & & & & & & & &  \\ 
  \hline
- 1.2 & \checkmark & & & \\
+ 1.2 &\checkmark & \checkmark & \checkmark & \checkmark &   &  & & & & & & \\
  \hline
- 1.3 &  & \checkmark & \checkmark & \\
+ 1.3 &  & &  & \checkmark & \checkmark  & \checkmark & \checkmark& & & & & \\
  \hline
- 2.1 & & \checkmark & \checkmark & \\
+ 2.1 & &  &  & &   &  & \checkmark&\checkmark &\checkmark & & & \\
 \hline
- 2.2 & & &  & \checkmark\\
+ 2.2 & & &  & &   &  & & &\checkmark  &\checkmark  & & \\
  \hline
- 3 & & & & \checkmark\\ [1ex] 
+ 3 & & & & &   &  & & & &\checkmark  &\checkmark  & \checkmark \\ [1ex] 
  \hline
 \end{tabular}
-\end{center}  
+\end{center}} 
 
 \section*{Funding requests}
 Our group would like to request the following funding.
