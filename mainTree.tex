@@ -125,10 +125,11 @@ Heat transfers within the tree trunk vertically, radially, and tree temperature 
 &\rho c \frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)\nonumber\\%+\text{ source term}
 &=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\frac{1}{r}\frac{\partial}{\partial \phi}\bigg(\frac{k}{r}\frac{\partial T}{\partial \phi}\bigg)+\frac{\partial}{\partial z}\bigg(k\frac{\partial T}{\partial z}\bigg)\label{heat3d}%+\text{ source term}
 \end{align}
+%%https://medium.com/@lucidlearning314/heat-conduction-equation-in-cylindrical-coordinates-3e26402ee1f8
 Here $T$ represents temperature (K), $\rho$ density (kg/m$^3$), $c$ specific heat (J/(kgK)), $t$ time (s), $k$ thermal conductivity (W/(mK)), $r$ distance from center of the tree (m), and $\phi$ azimuth angle, measured clockwise with south being $\phi=0$ (radian/degree), we assume $\partial k/\partial \phi=0$ \ref{potter_andresen}. 
 We gave previously \ref{1Dtree} used the following values of thermal conductivity $k$ and heat capacity $\rho c$ that were found in \ref{parameter}:
 \begin{itemize}
-    \item Thermal Conductivity: $k = 0.12 \frac{W}{mK}$
+    \item Thermal Conductivity: $k = 0.12 \frac{W}{mK}$ {\bluep aspen tree is a hard wood}
     \item Heat Capacity: $\rho c = 1.7 \frac{J}{KgK}$
 \end{itemize}
 %\textcolor{red}{reference to add if choose to use: Simpson, William; TenWolde, Anton. 1999. Physical properties and moisture relations of wood. Wood handbook : wood as an engineering material. Madison, WI : USDA Forest Service, Forest Products Laboratory, 1999. General technical report FPL ; GTR-113: Pages 3.1-3.24}
@@ -145,32 +146,35 @@ Therefore we consider a one dimensional simplification to the above model.
 
 \subsection{Simplification of temperature distribution model}
 
-We eliminate the dependence on height $z$ and direction $\phi$ to obtain the following standard heat equation for temperature distribution in two dimensional cylindrical coordinates:
-\begin{align}
-&\rho c\frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)\nonumber\\%+\text{ source term}
-&=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\frac{1}{r}\frac{\partial}{\partial \phi}\bigg(\frac{k}{r}\frac{\partial T}{\partial \phi}\bigg)\label{heat2d}%+\text{ source term}
-\end{align}
+%We eliminate the dependence on height $z$ and direction $\phi$ to obtain the following standard heat equation for temperature distribution in two dimensional cylindrical coordinates:
+%\begin{align}
+%&\rho c\frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)\nonumber\\%+\text{ source term}
+%&=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\frac{1}{r}\frac{\partial}{\partial \phi}\bigg(\frac{k}{r}\frac{\partial T}{\partial \phi}\bigg)\label{heat2d}%+\text{ source term}
+%\end{align}
 
-In the above simplified model, heat distribution depends on $r$, as well as $\phi$. For our application, we primarily care about the temperature differences during different time of the day along one direction (see Fig. \ref{fig:rod}), and install all devices in the direction where such differences occur at the largest magnitude. Hence, we seek to model heat distribution only in the directions of largest temperature difference. 
+%In the above simplified model, heat distribution depends on $r$, as well as $\phi$. For our application, we primarily care about the temperature differences during different time of the day along one direction (see Fig. \ref{fig:rod}), and install all devices in the direction where such differences occur at the largest magnitude. Hence, we seek to model heat distribution only in the directions of largest temperature difference. 
 
-As seen in Fig. 2 of \ref{potter_andresen}, in the northern hemisphere, the largest temperature differences occur in south and west directions. However, due to the limited access to data, we can only investigate the south and north aspect in this work. This further reduces the heat equation to a one dimensional problem and eliminates the $\phi$ dependence. Finally, we obtain a one-dimensional temperature PDE model. 
+%As seen in Fig. 2 of \ref{potter_andresen}, in the northern hemisphere, the largest temperature differences occur in south and west directions. However, due to the limited access to data, we can only investigate the south and north aspect in this work. This further reduces the heat equation to a one dimensional problem and eliminates the $\phi$ dependence. Finally, we obtain a one-dimensional temperature PDE model. 
+In the simplifed model, we see that temperature depends on time $t$ and depth $r$. 
 
 \begin{align}
 &\rho c\frac{\partial T}{\partial t}=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)\nonumber\\%+\text{ source term}
-&=k\frac{1}{r}\frac{\partial T}{\partial r}+k\frac{\partial^2T}{\partial r^2}.\label{heat1d}%+\text{ source term}
+&=\frac{\partial k}{\partial r}\frac{\partial T}{\partial r}+\frac{k}{r}\frac{\partial T}{\partial r}+k\frac{\partial^2T}{\partial r^2}.\label{heat1d}%+\text{ source term}
 \end{align}
+
+
 
 \section{Boundary conditions, source term and data} 
 The inner boundary condition is a no-flux condition
 \begin{equation}
     \frac{\partial T}{\partial r}\bigg|_{r=0}=0,
 \end{equation} as justified by \ref{firestem2d}.
-We use a Dirichlet condition at the outer boundary, and approximate the surface temperature by recorded ambient temperature from Tacoma during a 12 hour cycle starting at 7 am. 
+We use a Dirichlet condition at the outer boundary, and approximate the surface temperature by recorded ambient temperature from Tacoma during a {\bluep 12 hour cycle starting at 7 am. }
 
-The source term is made up from several types of sources, including convective heat loss/gain when the tree surface temp is different from the ambient temp (both free and forced), direct and diffusion solar radiation, and wave radiation from and to the tree as black bodies.  
+The source term is made up from several types of sources, {\bluep including convective heat loss/gain when the tree surface temp is different from the ambient temp (both free and forced), direct and diffusion solar radiation, and wave radiation from and to the tree as black bodies. } 
 
 \subsection{Convective heat loss/gain}
-We denote the heat loss/gain by $H$ \ref{potter_andresen}, and 
+{\bluep We denote the heat loss/gain by $H$ \ref{potter_andresen}, and 
 \begin{equation}
 H=h(T_{sfc}-T_{air}),
 \end{equation}
@@ -179,8 +183,10 @@ with $h$ (W/($m^2$K)) being the convective heat transfer coefficient. Here
 h=h_{free}-h_{forced},
 \end{equation}
 
+Heather's new model}
+
 \subsection{Solar radiation}
-$S_{dir} + S_{dif}$ represent direct solar radiation, plus diffusion solar radiation.
+{\bluep $S_{dir} + S_{dif}$ represent direct solar radiation, plus diffusion solar radiation.
 \begin{equation}
 S_{dir} = S_0(\tau)^{\sec(Z)}\cos(i)
 \end{equation}
@@ -196,8 +202,10 @@ In the end, the term we see as a source term is
 (1-\alpha)(S_{dif}+S_{dir})
 \end{equation}
 
+Selina's solar library}
 
 \subsection{Net Infrared}
+{\bluep modification??}
 The net infrared $IR_{in}-IR_{out}$ is the final source term and represents the difference between the radiation going to and the radiation coming from the tree.  
 
 The net infrared depends on $\sigma$, the Stefan-Boltzmann constant $5.67\times 10^{-8} \frac{W}{m^2K^2}$ as well as the temperature of the surface of the tree and the temperature of the surrounding air. The exact relationship is as follows
@@ -392,6 +400,10 @@ With the above FD scheme, combined example source term, and a constant temperatu
 \end{figure}
 \end{comment}
 
+\subsection{Sensitivity analysis of variable parameters}
+
+\subsection{Simulation efficiency and grid resolution study}
+
 From Fig.\ref{fig:at38}, Fig.\ref{fig:at29}, and Fig.\ref{fig:at2}, we conclude that the south aspects uniformly have a larger temperature range throughout the day; therefore it is preferable to install all TEG devices in the south. We also see that, the further away we are from the tree center, the trend of temperature is more consistent with heat flux. From our simulations, temperature distributions with medium depth don't differ significantly, for example, temperature measured at depth 7 to 9 inches have similar temperature ranges. We expected fairly constant temperature near the center of the trunk, but our simulation does not reflect that, and this is another issue we expect to address in our future work.
 With measurements of the tree surface temperature, our hardware team can adjust the length of the rod for optimal voltage generated from the temperature differences. The highest temperatures uniformly occur roughly 8 or 9 hours after we start the measurements, with lowest temperature in the beginning and end of the measurement cycle. 
 
@@ -417,7 +429,7 @@ We appreciate the contribution to this work by Nick Purcell of the University of
 
 \item  E. K. Chatziefstratiou, et al., “FireStem2D – A Two-Dimensional Heat Transfer Model for Simulating Tree Stem Injury in Fires,” PLoS ONE, vol. 8, no. 7, p.e70110, July 2013.\label{firestem2d}
 
-\item W. Simpson, A. TenWolde, “Physical properties and moisture relations of wood,” in \textit{ Wood handbook: wood as an engineering material}, Madison, WL: USDA Forest Service, Forest Products Laboratory, 1999, General technical report FPL, GTR-113: pp. 3.1-3.24\label{parameter} 
+\item W. Simpson, A. TenWolde, “Physical properties and moisture relations of wood,” in \textit{Wood handbook: wood as an engineering material}, Madison, WL: USDA Forest Service, Forest Products Laboratory, 1999, General technical report FPL, GTR-113: pp. 3.1-3.24\label{parameter} 
 
 \item S. Linge, H. P. Langtangen, “Diffusion Equations,” in \textit{Finite Difference Computing with PDEs}, vol. 6, 1st ed. Springer, 2017, ch.3, pp. 207-322.\label{2017book}
 
@@ -428,6 +440,9 @@ We appreciate the contribution to this work by Nick Purcell of the University of
 \item Y. An, O. Baiocchi, M. Hockman, and S. Teng, "Computational model for temperature in tree trunk for energy harvesting," 2020 IEEE International IOT, Electronics and Mechatronics Conference (IEMTRONICS), Vancouver, BC, Canada, 2020, pp. 1-6, 
 
 doi: 10.1109/IEMTRONICS51293.2020.9216373.\label{1Dtree}
+
+\item Rob Pickett, The Energy Performance of
+Log Homes (Documented Energy-efficiency and Thermal Mass Benefits)\label{logparameter}
 
 % The following sources are not cited in text (yet)
 
