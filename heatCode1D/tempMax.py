@@ -33,6 +33,15 @@ c = h1.temp(config)
 
 c.shape # (1000,50)
 
+tempDiff = np.zeros(c.shape[0])
+
+for j in range(tempDiff.size):
+    tempDiff[j] = np.abs(c[j,0] - c[j,-1])
+    
+MaxTempIndex = np.argmax(tempDiff)    
+    
+
+
 
 
 
