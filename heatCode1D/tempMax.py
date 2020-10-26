@@ -38,7 +38,9 @@ tempDiff = np.zeros(c.shape[0])
 for j in range(tempDiff.size):
     tempDiff[j] = np.abs(c[j,0] - c[j,-1])
     
-MaxTempIndex = np.argmax(tempDiff)    
+MaxTempIndex = np.argmax(tempDiff) 
+
+print("Max temperature difference occurs at", MaxTempIndex, "time step", ", the difference is", tempDiff[MaxTempIndex])   
     
 
 
