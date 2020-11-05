@@ -7,6 +7,10 @@ An efficient code to spit out time that gives the max temp differences
 
 combines heat1dK.py and tempMax.py
 
+Find the index of N max elements. For Numpy version higher than 1.8 (currently 1.18.4)
+https://stackoverflow.com/questions/6910641/how-do-i-get-indices-of-n-maximum-values-in-a-numpy-array
+
+Two peaks in temp curve might not be captured by two max values (local max and min)
 @author: yajun
 """
 import numpy as np
@@ -107,11 +111,15 @@ def tempTime(m):
     tempDiff = np.zeros(n)
     for j in range(n):
         tempDiff[j] = np.abs(soln_plot[j,0] - soln_plot[j,-1])
-    
-    MaxTempIndex = np.argmax(tempDiff) 
 
-    print("Max temperature difference occurs at", MaxTempIndex, "time step", "with grid point number ", m, ", the difference is", tempDiff[MaxTempIndex])   
-    
+# to find the time for max temp    
+#    MaxTempIndex = np.argmax(tempDiff) 
+#    print("Max temperature difference occurs at", MaxTempIndex, "time step", "with grid point number ", m, ", the difference is", tempDiff[MaxTempIndex])   
+
+# to find the time for two max temp replace 2 by N to find N max values
+    ind = np.argpartition(tempDiff, -2)[-2:]
+    print("Max temperature difference occurs at", ind, "time step", "with grid point number ", m, ", the difference is", tempDiff[ind])   
+         
     
     return 
 
