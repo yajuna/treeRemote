@@ -32,9 +32,9 @@ import heat1dK as h1
 
 c = h1.temp(config)
 
-print("shape of array ", c.shape) # (1000,gridPoint)
+#print("shape of array ", c.shape) # (1000,gridPoint)
 
-tempDiff = np.zeros(c[0].shape[0]) # number of rows, number of time steps
+tempDiff = np.zeros(c.shape[0]) # number of rows, number of time steps
 
 for j in range(tempDiff.size):
     tempDiff[j] = np.abs(c[j,0] - c[j,-1])

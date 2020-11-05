@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Oct  9 11:44:59 2020
+Created on Tue Nov  3 20:07:33 2020
 
-modified from heat1dCNpolar.py, incorporate variable thermal conductivity. 
+An efficient code to spit out time that gives the max temp differences
 
-To study: find time where the center and the bark has biggest temp difference
+combines heat1dK.py and tempMax.py
 
 @author: yajun
 """
@@ -16,27 +16,42 @@ from mpl_toolkits.mplot3d import Axes3D # matplotlib version 3.1.0
 # import source terms and bdry conditions
 from sourceS import * # source term at bdry
 from Temp_dataVec import * # boundary at tree bark
-#%%
+
 config = dict()
-config['gridPoints'] = 50
-config['timeSteps'] = 1000
+
+config['timeSteps'] = 1000 # n
 mu,sigma = 1, 0.001 # mean and standard deviation
-config['thermalConductivity'] = 0.12*np.random.normal(mu, sigma, 6)
-config['heatCapacity_rhoc'] = 1.7
-config['at_point'] = 38
+config['thermalConductivity'] = 0.12*np.ones(12) # k
+config['heatCapacity_rhoc'] = 1.7  # rhoc
 config['time'] = np.linspace(0, 1000, 50, endpoint = False)
-#%%
-def temp(config):
-    m = config['gridPoints']
-    n = config['timeSteps']
-    k = config['thermalConductivity']
-    k = np.asarray(k)
-    rhoc = config['heatCapacity_rhoc']
-    at_point = config['at_point'] 
+
+m = 75 # number of grid points
+
+# %% define bdry and initial conditions. 
+
+# initial condition being const. temp at 7 am
+def eta(m):
+    return ((56 - 32) * 5/ 9 + 273.15) * np.ones(m)
+
+## tree center bdry condition is homogeneous Neumann condition. In matrix
+
+## tree bark with Dirichlet condition for temperature
+def g1(t):
+    return tTemp[t]
+
+# source term at tree bark
+def gs(t):
     
-    time = config['time']
-    timeInt = time.astype(int)
-    timelist = timeInt.tolist()
+    return sourceTermsSvalue(t)
+
+#%% main function
+
+def tempTime(m):
+    
+    n = 1000
+    k = 0.12*np.ones(12)
+    k = np.asarray(k)
+    rhoc = 1.7
     
     r = np.linspace(0, 1, m, endpoint=False)
     t = np.linspace(0, 12, n, endpoint=False)
@@ -88,53 +103,37 @@ def temp(config):
 
 # %% print solutions
     soln_plot = np.asarray(soln)
-    print("max and min of soln at ", at_point, " = ", np.max(soln_plot[:, at_point]), np.min(soln_plot[:, at_point]))
     
-##%% visualize
-#    plt.plot(t, soln_plot[:, at_point], '.r-')
-#    plt.title('Temperature with combined source term at grid point r=%i ' % at_point)
-#    plt.axis([0,12,280,305])
-#    plt.xlabel('Time since 7:00am (hrs)')
-#    plt.ylabel('Temperature Distribution (K)')
-#    plt.savefig('/home/yajun/Documents/treePower/figs/' + 'StempK' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')
-#    plt.show()
-#
-#    return np.max(soln_plot[-1, :]), np.min(soln_plot[-1, :])
-
-#%% 3D visualization, plot a wireframe.
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    X, Y = np.meshgrid(r, timelist)
-    solnFig = soln_plot[timelist, :]
-#    zs = np.array([solnFig for r, timelist in zip(np.ravel(X), np.ravel(Y))])
-    Z = solnFig.reshape(X.shape)
-
-    ax.plot_wireframe(X, Y, Z, rstride=1, cstride=1)
-
-    ax.set_xlabel('Radius grid')
-    ax.set_ylabel('Time step')
-    ax.set_zlabel('Temperature (K)')
-
-    ax.set_title('Temperature distribution')
-#    plt.savefig('/home/yajun/Documents/treePower/figs/' + 'Stemp' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')
-    plt.show()
-
-    return soln_plot
-######################################################################
-# %% define bdry and initial conditions. 
-
-# initial condition being const. temp at 7 am
-def eta(m):
-    return ((56 - 32) * 5/ 9 + 273.15) * np.ones(m)
-
-## tree center bdry condition is homogeneous Neumann condition. In matrix
-
-## tree bark with Dirichlet condition for temperature
-def g1(t):
-    return tTemp[t]
-
-# source term at tree bark
-def gs(t):
+    tempDiff = np.zeros(n)
+    for j in range(n):
+        tempDiff[j] = np.abs(soln_plot[j,0] - soln_plot[j,-1])
     
-    return sourceTermsSvalue(t)
+    MaxTempIndex = np.argmax(tempDiff) 
+
+    print("Max temperature difference occurs at", MaxTempIndex, "time step", "with grid point number ", m, ", the difference is", tempDiff[MaxTempIndex])   
+    
+    
+    return 
+
+#%% for loop to get time for max temp difference
+    
+for m in range(50, 500, 50):
+    tempTime(m)
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
