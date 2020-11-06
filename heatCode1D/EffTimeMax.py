@@ -120,7 +120,7 @@ def tempTime(m):
     ind = np.argpartition(tempDiff, -2)[-2:]
     print("Max temperature difference occurs at", ind, "time step", "with grid point number ", m, ", the difference is", tempDiff[ind])   
          
-    
+    print("Temperature of center and tree bark as a function of time", tempDiff)
     return 
 
 #%% for loop to get time for max temp difference
