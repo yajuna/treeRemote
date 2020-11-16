@@ -13,8 +13,10 @@ import numpy as np
 from scipy import sparse
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D # matplotlib version 3.1.0
+
 # import source terms and bdry conditions
-from sourceS import * # source term at bdry
+import solarSourceData as solar # source from radiation; data from selina
+import sourceS as sourceSouth # source term at bdry
 from Temp_dataVec import * # boundary at tree bark
 #%%
 config = dict()
@@ -137,4 +139,4 @@ def g1(t):
 # source term at tree bark
 def gs(t):
     
-    return sourceTermsSvalue(t)
+    return solar.solar(t) # sourceSouth.sourceTermsSvalue(t) # toy data from the south
