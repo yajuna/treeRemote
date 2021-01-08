@@ -119,6 +119,7 @@ def temp(config):
     ax.set_zlabel('Temperature (K)')
 
     ax.set_title('Temperature distribution')
+    plt.savefig('/home/yajun/Documents/treePower/solarSourceDataFig/' + 'OnlySolar' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')
 #    plt.savefig('/home/yajun/Documents/treePower/figs/' + 'Stemp' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')
     plt.show()
 
