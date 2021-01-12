@@ -84,7 +84,7 @@ def outerBdry(**param):
         Tb2 = (DeltaTeq + Ta) # K
         # this new value of the temperature is used for the calculations
         Tb = Tb2
-        Tbfinal = Tb - 273.2
+    Tbfinal = Tb - 273.2
     return Tbfinal
     
     
