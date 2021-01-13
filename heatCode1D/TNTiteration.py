@@ -69,21 +69,24 @@ def outerBdry(**param):
 #%% calculate the conduction term
     Rcond = np.log(rb/r1) / (2 * np.pi * L * Kt) # K/W
     qcond = DeltaT / Rcond # W
+    # resistors for convection
+    Rconv = 1/(h*2*np.pi*rb*L) # K/W
+    #qcond = qrads + qeq
+    qeq = qcond-qrads # W
 #%% iteration step. Replace with root solver
     for j in range(10):
         # estimate hrad iteratively
         hr = epsilon * sigma * (Tb + Ta) * (Tb**2 + Ta**2)
-        # resistors for convection and conduction
-        Rconv = 1/(h*2*np.pi*rb*L) # K/W
+        # resistors for conduction
         Rrad = 1/(hr*2*np.pi*rb*L) # K/W
         Req = 1/((1/Rrad)+(1/Rconv)) # K/W
         # Conservation of energy at the Tb node
-        #qcond = qrads + qeq
-        qeq = qcond-qrads # W
         DeltaTeq = qeq*Req # K
         Tb2 = (DeltaTeq + Ta) # K
         # this new value of the temperature is used for the calculations
         Tb = Tb2
+        print("hr=", hr, "Rrad=", Rrad, "Req=", Req, "DeltaTeq=", DeltaTeq, "Tb=", Tb, "at step j =", j)
+    
     Tbfinal = Tb - 273.2
     return Tbfinal
     
