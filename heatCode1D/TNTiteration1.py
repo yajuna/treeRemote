@@ -5,19 +5,45 @@ Created on Fri Jan 15 10:14:34 2021
 
 combine yajun's code and a nonliner solver from scipy
 
+to do 
+
 @author: yajun
 """
 import numpy as np
-
 import scipy.optimize
 
-param = {"Ta": 29 + 273.2, "Tb": 22 + 273.2, "Va": 10, "qrads": 650, "Pr": 0.707, "Ka": 26.3*10**-3, "Kt": 0.11, 
-         "nu": 15.89*10**-6, "epsilon": 0.8, "sigma": 5.67*10**-8, "C": 0.193, "m": 0.618, "rb": 0.2,
+param = {"Ta": 29 + 273.2, "Tb": 22 + 273.2, "Va": 10, "qrads": 650, "Pr": 0.707, "Ka": 26.3 * 10 ** -3, "Kt": 0.11,
+         "nu": 15.89 * 10 ** -6, "epsilon": 0.8, "sigma": 5.67 * 10 ** -8, "C": 0.193, "m": 0.618, "rb": 0.2,
          "L": 10, "DeltaT": 2, "DeltaR": 100 / 1000}
 
-def outerBdry(Tb, **param):
+# Function we need to solve for Tb
+def F(Tb):
+    C = 0.193
+    m = 0.618
+    Pr = 0.707
+    Ka = 26.3
+    nu = 15.89 * 10 ** -6
+    Va = 10
+    epsilon = 0.8
+    sigma = 5.67*10**-8
+    Ta = 29+273.2
+    rb = 0.2
+    L = 10
+    Kt = 0.11
+    DeltaT = 2
+    r1 = rb - 100 / 1000
+    Re = Va * (2 * rb) / nu
+    Nu = C * (Re ** m) * Pr ** (1 / 3)  # Nusselt number
+    h = Nu * Ka / (rb * 2)  # W/m2-k heat transfer coefficient
+    Rcond = np.log(rb / r1) / (2 * np.pi * L * Kt)  # K/W
+    qcond = DeltaT / Rcond  # W
+    qrads = 650
+    qeq = qcond-qrads
+    return Ta + qeq/(2*np.pi*L*h*rb + 2*L*epsilon*rb*sigma*np.pi*(Ta**3 + Ta**2*Tb + Ta*Tb**2 + Tb**3))-Tb
+
+def outerBdry(**param):
     Ta = param["Ta"]
-#    Tb = param["Tb"]
+    Tb = param["Tb"]
     Va = param["Va"]
     qrads = param["qrads"]
     Pr = param["Pr"]
@@ -32,30 +58,45 @@ def outerBdry(Tb, **param):
     L = param["L"]
     DeltaT = param["DeltaT"]
     DeltaR = param["DeltaR"]
-    
-    # r1 = m radius of tree at which 2nd temp is measured    
+
+    # r1 = m radius of tree at which 2nd temp is measured
     r1 = rb - DeltaR
-#%% estimate h using correlations
-    Re = Va * (2 * rb)/nu # Reynolds number
-    Nu = C * (Re**m) * Pr**(1/3) # Nusselt number
-    h = Nu * Ka / (rb * 2) # W/m2-k heat transfer coefficient
-#%% calculate the conduction term
-    Rcond = np.log(rb/r1) / (2 * np.pi * L * Kt) # K/W
-    qcond = DeltaT / Rcond # W
+
+    # %% estimate h using correlations
+    Re = Va * (2 * rb) / nu  # Reynolds number
+    Nu = C * (Re ** m) * Pr ** (1 / 3)  # Nusselt number
+    h = Nu * Ka / (rb * 2)  # W/m2-k heat transfer coefficient
+    # %% calculate the conduction term
+    Rcond = np.log(rb / r1) / (2 * np.pi * L * Kt)  # K/W
+    qcond = DeltaT / Rcond  # W
     # resistors for convection
-    Rconv = 1/(h*2*np.pi*rb*L) # K/W
-    #qcond = qrads + qeq
-    qeq = qcond-qrads # W
-    
-    Temp = Ta + qeq/(2*np.pi*L*h*rb + 2*L*epsilon*rb*sigma*np.pi*(Ta**3 + Ta**2*Tb + Ta*Tb**2 + Tb**3))-Tb
+    Rconv = 1 / (h * 2 * np.pi * rb * L)  # K/W
+    # qcond = qrads + qeq
+    qeq = qcond - qrads  # W
+    # %% iteration step. Replace with root solver
+    # for j in range(10):
+    #     # estimate hrad iteratively
+    #     hr = epsilon * sigma * (Tb + Ta) * (Tb ** 2 + Ta ** 2)
+    #     # resistors for conduction
+    #     Rrad = 1 / (hr * 2 * np.pi * rb * L)  # K/W
+    #     Req = 1 / ((1 / Rrad) + (1 / Rconv))  # K/W
+    #     # Conservation of energy at the Tb node
+    #     DeltaTeq = qeq * Req  # K
+    #     Tb2 = (DeltaTeq + Ta)  # K
+    #     # this new value of the temperature is used for the calculations
+    #     Tb = Tb2
+    #     print("hr=", hr, "Rrad=", Rrad, "Req=", Req, "DeltaTeq=", DeltaTeq, "Tb=", Tb, "at step j =", j)
 
-    return Temp
+    Tb = scipy.optimize.broyden1(F, 280)
+    hr = epsilon * sigma * (Tb + Ta) * (Tb ** 2 + Ta ** 2)
+    Tbfinal = Tb - 273.2
+    print("hr=", hr, "Tb=", Tbfinal)
+    return Tbfinal
 
-Tb = 22 + 273.2
 
-T = scipy.optimize.broyden1(outerBdry, Tb)
+outerBdry(**param)
 
-Tbfinal = T - 273.2
+
 """
 
 % Simple script to test the idea of iteration as a method to solve for
