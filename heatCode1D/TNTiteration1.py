@@ -5,7 +5,7 @@ Created on Fri Jan 15 10:14:34 2021
 
 combine yajun's code and a nonliner solver from scipy
 
-to do 
+to do change data to mango tree and incorporate data from Protasio
 
 @author: yajun
 """
