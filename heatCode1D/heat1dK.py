@@ -5,8 +5,6 @@ Created on Fri Oct  9 11:44:59 2020
 
 modified from heat1dCNpolar.py, incorporate variable thermal conductivity. 
 
-To study: find time where the center and the bark has biggest temp difference
-
 @author: yajun
 """
 import numpy as np
