@@ -2,19 +2,15 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Oct  9 11:44:59 2020
-
 modified from heat1dCNpolar.py, incorporate variable thermal conductivity. 
-
 @author: yajun
 """
 import numpy as np
 from scipy import sparse
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D # matplotlib version 3.1.0
-
 # import source terms and bdry conditions
-import solarSourceData as solar # source from radiation; data from selina
-import sourceS as sourceSouth # source term at bdry
+from sourceS import * # source term at bdry
 from Temp_dataVec import * # boundary at tree bark
 #%%
 config = dict()
@@ -87,7 +83,9 @@ def temp(config):
         soln.append(U0)
 
 # %% print solutions
+#    print(soln)
     soln_plot = np.asarray(soln)
+#    print(soln_plot.shape)
     print("max and min of soln at ", at_point, " = ", np.max(soln_plot[:, at_point]), np.min(soln_plot[:, at_point]))
     
 ##%% visualize
@@ -117,7 +115,6 @@ def temp(config):
     ax.set_zlabel('Temperature (K)')
 
     ax.set_title('Temperature distribution')
-    plt.savefig('/home/yajun/Documents/treePower/solarSourceDataFig/' + 'OnlySolar' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')
 #    plt.savefig('/home/yajun/Documents/treePower/figs/' + 'Stemp' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')
     plt.show()
 
@@ -138,4 +135,4 @@ def g1(t):
 # source term at tree bark
 def gs(t):
     
-    return solar.solar(t) # sourceSouth.sourceTermsSvalue(t) # toy data from the south
+    return sourceTermsSvalue(t)
