@@ -74,7 +74,7 @@ def outerBdry(**param):
     #qcond = qrads + qeq
     qeq = qcond-qrads # W
 #%% iteration step. Replace with root solver
-    for j in range(10):
+    for j in range(1000):
         # estimate hrad iteratively
         hr = epsilon * sigma * (Tb + Ta) * (Tb**2 + Ta**2)
         # resistors for conduction
@@ -85,7 +85,7 @@ def outerBdry(**param):
         Tb2 = (DeltaTeq + Ta) # K
         # this new value of the temperature is used for the calculations
         Tb = Tb2
-        print("hr=", hr, "Rrad=", Rrad, "Req=", Req, "DeltaTeq=", DeltaTeq, "Tb=", Tb, "at step j =", j)
+#        print("hr=", hr, "Rrad=", Rrad, "Req=", Req, "DeltaTeq=", DeltaTeq, "Tb=", Tb, "at step j =", j)
     
     Tbfinal = Tb - 273.2
     return Tbfinal
