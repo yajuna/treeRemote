@@ -13,6 +13,16 @@ To validate computation, use data from Protasio's data on Jan 21.
 
 Parameters replaced by Protasio's data on mango trees.
 
+to run:
+run heatMain
+c = temp(config)  
+
+to test parameter:
+run heatMain
+for j in range(1,50):
+    config['at_point'] = j
+    c = temp(config)
+
 @author: yajuna
 """
 import numpy as np
@@ -28,8 +38,8 @@ config['gridPoints'] = 50
 config['timeSteps'] = 1000
 mu,sigma = 1, 0.001 # mean and standard deviation
 config['thermalConductivity'] = 0.12*np.random.normal(mu, sigma, 6)
-config['heatCapacity_rhoc'] = 1.7
-config['at_point'] = 49
+config['heatCapacity_rhoc'] = 1.7*510
+config['at_point'] = 38
 config['time'] = np.linspace(0, 1000, 50, endpoint = False)
 #%%
 def temp(config):

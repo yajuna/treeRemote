@@ -18,7 +18,7 @@ Main function to call is BATCH (bark at tree, coefficient of heat)
 
 EX. 
 import TNTvec as tntV
-h, Tb = tnt2.BATCH()
+h, Tb = tntV.BATCH()
 
 ## to generate h and bdry, directly - run TNTvec -
 

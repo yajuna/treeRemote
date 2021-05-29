@@ -3,6 +3,21 @@
 """
 Created on Fri Oct  9 11:44:59 2020
 modified from heat1dCNpolar.py, incorporate variable thermal conductivity. 
+
+update: 
+modified to include rho and c values consistent with Potter and Andresen, 
+use data in Table 1., use Pine test.
+
+to run:
+run heat1dK
+c = temp(config)  
+
+to test parameter:
+run heat1dK
+for j in range(1,50):
+    config['at_point'] = j
+    c = temp(config)
+    
 @author: yajun
 """
 import numpy as np
@@ -17,8 +32,9 @@ config = dict()
 config['gridPoints'] = 50
 config['timeSteps'] = 1000
 mu,sigma = 1, 0.001 # mean and standard deviation
-config['thermalConductivity'] = 0.12*np.random.normal(mu, sigma, 6)
-config['heatCapacity_rhoc'] = 1.7
+config['thermalConductivity'] = 0.46*np.random.normal(mu, sigma, 6)
+config['rho'] = 686
+config['c'] = 2470
 config['at_point'] = 38
 config['time'] = np.linspace(0, 1000, 50, endpoint = False)
 #%%
@@ -27,7 +43,7 @@ def temp(config):
     n = config['timeSteps']
     k = config['thermalConductivity']
     k = np.asarray(k)
-    rhoc = config['heatCapacity_rhoc']
+    rhoc = config['rho'] * config['c']
     at_point = config['at_point'] 
     
     time = config['time']
