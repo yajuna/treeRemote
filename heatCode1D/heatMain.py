@@ -13,6 +13,12 @@ To validate computation, use data from Protasio's data on Jan 21.
 
 Parameters replaced by Protasio's data on mango trees.
 
+Current issue: data for heatCapacity (rho*c) is incorrect. 
+1. incorrect value: 1.7 from Nick's data
+2. correct value: for soft wood, we should use 
+2.1: density 510 kg/m^3
+2.2: specific heat 1380 J/(kg * K)
+
 to run:
 run heatMain
 c = temp(config)  
@@ -38,7 +44,7 @@ config['gridPoints'] = 50
 config['timeSteps'] = 1000
 mu,sigma = 1, 0.001 # mean and standard deviation
 config['thermalConductivity'] = 0.12*np.random.normal(mu, sigma, 6)
-config['heatCapacity_rhoc'] = 1.7*510
+config['heatCapacity_rhoc'] = 1380*510
 config['at_point'] = 38
 config['time'] = np.linspace(0, 1000, 50, endpoint = False)
 #%%
