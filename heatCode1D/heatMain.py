@@ -19,7 +19,7 @@ Current issue: data for heatCapacity (rho*c) is incorrect.
 2.1: density 510 kg/m^3
 2.2: specific heat 1380 J/(kg * K)
 
-diameter: 18 in = 0.4572 m; grid size = .4572 * 0.5 / numberGridPoints
+diameter: 36 cm = 0.36 m; grid size = .36 * 0.5 / numberGridPoints
 
 c might change as a function of the environment, so consider as well
 
@@ -44,7 +44,7 @@ import source as stree # source term at bdry
 import TNTvec as tntv # boundary at tree bark
 #%%
 config = dict()
-config['gridPoints'] = 50
+config['gridPoints'] = 160
 config['timeSteps'] = 1000
 mu,sigma = 1, 0.001 # mean and standard deviation
 config['thermalConductivity'] = 0.12*np.random.normal(mu, sigma, 6)
@@ -64,7 +64,7 @@ def temp(config):
     timeInt = time.astype(int)
     timelist = timeInt.tolist()
     
-    r = np.linspace(0, 0.4572 * 0.5, m, endpoint=False)
+    r = np.linspace(0, 0.36 * 0.5, m, endpoint=False)
     t = np.linspace(0, 12, n, endpoint=False)
     
     dr = r[1] - r[0]
