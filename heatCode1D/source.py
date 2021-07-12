@@ -27,4 +27,5 @@ blackbody = sigma * (tempAir**4 - tntv.bdryArray**4) # Tair^4 - Tsfc^4
 
 convect = tntv.hArray * (tntv.bdryArray - tempAir)
 
-source = solar + blackbody + convect
+sourceTerm = solar + blackbody + convect
+

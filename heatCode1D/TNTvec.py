@@ -3,6 +3,8 @@
 """
 Created on Thu Feb 18 15:24:43 2021
 
+Question: "DeltaR": 100 / 1000 why is it?? change to 0.18/160, gridPoint = 160??
+
 The following are modifications from TNTiteration2.py
 
 input Ta as a vector: read center temperature as cR.coreTemp16np, 
@@ -14,18 +16,18 @@ then use Va[j] to compute Tb
 gridPoint = 50, rb = radius of tree at bark = 0.2
 
 ##########
-Main function to call is BATCH (bark at tree, coefficient of heat)
+Main function to call is chtbt (convective heat transfer, back temp) 
 
 EX. 
 import TNTvec as tntV
-h, Tb = tntV.BATCH()
+h, Tb = tntV.chtbt()
 
 ## to generate h and bdry, directly - run TNTvec -
 
-line 79: r1 = deltaX 0.2/50
+line 79: r1 = deltaX 0.18/int(gridPoint)
 then DeltaT is temp diff corresponding to r1
 
-radius of mango tree about 36 / 2 cm
+diameter of mango tree about 36 cm, rb = 0.18
 
 Conductivity computed by Hee-Seok
 
@@ -47,9 +49,9 @@ h = []
 bdry = []
 for j in range(interpretated.shape):
     param = {"Ta": coreTemp16npinte[j], "Va": windspeed16npinte[j], "qrads": 650, "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.11,
-         "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.2,
+         "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.18,
          "L": 10, "DeltaT": 2, "DeltaR": 0.2 / 50, "timeSteps": 1000}
-    h, Tb = tnt2.BATCH()
+    h, Tb = tnt2.chtbt()
     h.append(h)
     bdry.append(Tb)
 """
@@ -103,14 +105,14 @@ def heatTransferCoeff(**param):
 
 Tbinit = 22 + 273.2
 
-def BATCH():
+def chtbt():
     h = heatTransferCoeff(**param)
     Tb = broyden1(partial(F, **param), Tbinit)
     Tbfinal = Tb # Tb - 273.2 if celsius
     return h, Tbfinal
 
 #%%
-barkTemp = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.barkTemp16np.size),cR.barkTemp16np)
+#barkTemp = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.barkTemp16np.size),cR.barkTemp16np)
     
 
 coreTemp = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.coreTemp16np.size),cR.coreTemp16np)
@@ -121,11 +123,12 @@ bdry = []
 
 for j in range(1000):
     param = {"Ta": coreTemp[j], "Va": windSpeed[j], "qrads": 650, "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.11,
-         "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.2,
-         "L": 10, "DeltaT": 2, "DeltaR": 100 / 1000, "timeSteps": 1000}
-    h, Tb = BATCH()
+         "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.18,
+         "L": 10, "DeltaT": 2, "DeltaR": 100/1000, "timeSteps": 1000}
+    h, Tb = chtbt()
     hVec.append(h)
     bdry.append(Tb)
     
 hArray = np.asarray(hVec)
 bdryArray = np.asarray(bdry)
+

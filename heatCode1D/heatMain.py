@@ -19,6 +19,10 @@ Current issue: data for heatCapacity (rho*c) is incorrect.
 2.1: density 510 kg/m^3
 2.2: specific heat 1380 J/(kg * K)
 
+diameter: 18 in = 0.4572 m; grid size = .4572 * 0.5 / numberGridPoints
+
+c might change as a function of the environment, so consider as well
+
 to run:
 run heatMain
 c = temp(config)  
@@ -60,7 +64,7 @@ def temp(config):
     timeInt = time.astype(int)
     timelist = timeInt.tolist()
     
-    r = np.linspace(0, 1, m, endpoint=False)
+    r = np.linspace(0, 0.4572 * 0.5, m, endpoint=False)
     t = np.linspace(0, 12, n, endpoint=False)
     
     dr = r[1] - r[0]
@@ -161,4 +165,4 @@ def g1(t):
 # source term at tree bark
 def gs(t):
     
-    return stree.source[t]
+    return stree.sourceTerm[t]

@@ -12,6 +12,8 @@ speed, air temperature, and solar radiation
 TNTtemp.csv has temp date from location, dating Feb 16-18: core 
 temperature and bark temperature
 
+TNTweather: line 4-27, or 6-29?? Data is from Feb 16. 
+
 @author: yajuna
 """
 import pandas
