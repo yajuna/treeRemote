@@ -122,7 +122,8 @@ def temp(config):
 #    print("max and min of soln at ", at_point, " = ", np.max(soln_plot[:, at_point]), np.min(soln_plot[:, at_point]))
     
     soln_diff = soln_plot[:,point_pair[0]]-soln_plot[:,point_pair[1]]
-    print("max difference throughout the day: core and bark at", point_pair, "=", np.max(np.abs(soln_diff)))
+    if np.max(np.abs(soln_diff))>1e-3:
+        print("max difference throughout the day: core and bark at", point_pair, "=", np.max(np.abs(soln_diff)))
 
 #%% 2D visualize
     if vis == 2:
