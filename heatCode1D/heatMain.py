@@ -21,7 +21,8 @@ Current issue: data for heatCapacity (rho*c) is incorrect.
 
 diameter: 36 cm = 0.36 m; grid size = .36 * 0.5 / numberGridPoints
 
-c might change as a function of the environment, so consider as well
+function can output temperature of the tree trunk at chosen grid, or temperature
+differences between two grid points.
 
 to run:
 run heatMain
@@ -29,7 +30,7 @@ c = temp(config)
 
 to test parameter:
 run heatMain
-for j in range(1,50):
+for j in range(1,50,5):
     config['at_point'] = j
     c = temp(config)
 
@@ -46,10 +47,11 @@ import TNTvec as tntv # boundary at tree bark
 config = dict()
 config['gridPoints'] = 160
 config['timeSteps'] = 1000
-mu,sigma = 1, 0.001 # mean and standard deviation
-config['thermalConductivity'] = 0.12*np.random.normal(mu, sigma, 6)
-config['heatCapacity_rhoc'] = 1380*510
+#mu,sigma = 1, 0.001 # mean and standard deviation
+config['thermalConductivity'] = 0.12*np.ones(6) # 0.12*np.random.normal(mu, sigma, 6)
+config['heatCapacity_rhoc'] = 510*1380
 config['at_point'] = 38
+config['point_pair'] = [1,-5]
 config['time'] = np.linspace(0, 1000, 50, endpoint = False)
 #%%
 def temp(config):
@@ -59,13 +61,14 @@ def temp(config):
     k = np.asarray(k)
     rhoc = config['heatCapacity_rhoc']
     at_point = config['at_point'] 
+    point_pair = config['point_pair']
     
     time = config['time']
     timeInt = time.astype(int)
     timelist = timeInt.tolist()
     
     r = np.linspace(0, 0.36 * 0.5, m, endpoint=False)
-    t = np.linspace(0, 12, n, endpoint=False)
+    t = np.linspace(0, 24, n, endpoint=False)
     
     dr = r[1] - r[0]
     dt = t[1] - t[0]
@@ -112,22 +115,22 @@ def temp(config):
         U0 = U1
         soln.append(U0)
 
-# %% print solutions
+#%% print solutions
 #    print(soln)
     soln_plot = np.asarray(soln)
 #    print(soln_plot.shape)
-    print("max and min of soln at ", at_point, " = ", np.max(soln_plot[:, at_point]), np.min(soln_plot[:, at_point]))
     
-##%% visualize
+#    print("max and min of soln at ", at_point, " = ", np.max(soln_plot[:, at_point]), np.min(soln_plot[:, at_point]))
+    print("max difference throughout the day: core and bark at", point_pair, "=", np.max(np.abs(soln_plot[:,point_pair[0]]-soln_plot[:,point_pair[1]])))
+
+#%% visualize
 #    plt.plot(t, soln_plot[:, at_point], '.r-')
 #    plt.title('Temperature with combined source term at grid point r=%i ' % at_point)
-#    plt.axis([0,12,280,305])
+#    plt.axis([0,24,280,305])
 #    plt.xlabel('Time since 7:00am (hrs)')
 #    plt.ylabel('Temperature Distribution (K)')
 #    plt.savefig('/home/yajun/Documents/treePower/figs/' + 'StempK' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')
 #    plt.show()
-#
-#    return np.max(soln_plot[-1, :]), np.min(soln_plot[-1, :])
 
 #%% 3D visualization, plot a wireframe.
     fig = plt.figure()
@@ -142,19 +145,31 @@ def temp(config):
 
     ax.set_xlabel('Radius grid')
     ax.set_ylabel('Time step')
-    ax.set_zlabel('Temperature (K)')
-
-    ax.set_title('Temperature distribution')
+    
+#    ax.set_zlabel('Temperature (K)')
+#    ax.set_title('Temperature distribution')
+    
+    ax.set_zlabel('$\Delta T$ (K)')
+    message = f"Temp difference at grid points {point_pair}"
+    ax.set_title(message)
 #    plt.savefig('/home/yajun/Documents/treePower/figs/' + 'Stemp' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')
     plt.show()
 
-    return soln_plot
+#    return soln_plot
+
+    return soln_plot[:,point_pair[0]]-soln_plot[:,point_pair[1]]
+
+
+#%% visualize when output is the temperature difference between somewhere in 
+# core and somewhere in bark.
+    
+
 ######################################################################
 # %% define bdry and initial conditions. 
 
 # initial condition being const. temp at 7 am
 def eta(m):
-    return ((56 - 32) * 5/ 9 + 273.15) * np.ones(m)
+    return 300.40 * np.ones(m)# ((56 - 32) * 5/ 9 + 273.15) * np.ones(m)
 
 ## tree center bdry condition is homogeneous Neumann condition. In matrix
 
