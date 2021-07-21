@@ -48,10 +48,10 @@ config['timeSteps'] = 1000
 config['thermalConductivity'] = 0.12*np.ones(6) # 0.12*np.random.normal(mu, sigma, 6)
 config['heatCapacity_rhoc'] = 510*1380
 config['at_point'] = 38
-config['point_pair'] = [1,-5]
+config['point_pair'] = [1,-2]
 config['time'] = np.linspace(0, 1000, 50, endpoint = False)
-config['output'] = 'tempdiff'
-config['visualization dimension'] = 1
+config['output'] = 'temp'
+config['visualization dimension'] = 1 # 2, 3
 #%%
 def temp(config):
     m = config['gridPoints']
@@ -155,7 +155,9 @@ def temp(config):
         
 #%% no visualization for quick testing        
     else: 
-        None    
+        None  
+
+#%% output all solution with 'tmep' or only temp difference between two grid points
     if output == 'temp':
         return soln_plot
     else:
