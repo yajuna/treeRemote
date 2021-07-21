@@ -25,12 +25,11 @@ to run:
 run heatMain
 c = temp(config)  
 
-to test parameter:
+to test parameter for bark grid (centers are roughly the same)
 run heatMain
-for i in range(30):
-    for j in range(0, -30, -1):
-        config['point_pair'] = [i,j]
-        c = temp(config)
+for j in range(0, -30, -1):
+    config['point_pair'] = [5,j]
+    c = temp(config)
 
 @author: yajuna
 """
@@ -51,7 +50,7 @@ config['heatCapacity_rhoc'] = 510*1380
 config['at_point'] = 38
 config['point_pair'] = [1,-5]
 config['time'] = np.linspace(0, 1000, 50, endpoint = False)
-
+config['output'] = 'tempdiff'
 config['visualization dimension'] = 1
 #%%
 def temp(config):
@@ -63,6 +62,7 @@ def temp(config):
     at_point = config['at_point'] 
     point_pair = config['point_pair']
     vis = config['visualization dimension']
+    output = config['output']
     time = config['time']
     
     timeInt = time.astype(int)
@@ -156,8 +156,10 @@ def temp(config):
 #%% no visualization for quick testing        
     else: 
         None    
-#    return soln_plot
-    return soln_diff
+    if output == 'temp':
+        return soln_plot
+    else:
+        return soln_diff
 ######################################################################
 # %% define bdry and initial conditions. 
 # initial condition being const. approx. temp at 12 am 
