@@ -15,7 +15,8 @@ the core temperature and the bark temperature (in either C or K). The current
 you calculate E, will be in mV, and we should have a different value of E for 
 each point in time we do the calculation for. 
 
-Protasio Seebeck coeff: 48mV/K (material: bismuth telluride, for a semi conductor)
+Protasio Seebeck coeff: 48mV/K (material: bismuth telluride, for a semi conductor), 
+no switch of sign
 
 TEG model: SP1848-27145 TEG Peltier Module Thermoelectric Power Generator 
 
@@ -38,7 +39,7 @@ soln_diff = soln[:,point_pair[0]]-soln[:,point_pair[1]]
 import source as stree # source term at bdry 
 
 s1 = 48#0.207 # outside warmer
-s2 = -48#-0.259 # outside colder
+s2 = 48#-0.259 # outside colder
 
 E = soln[:,0]
 for j in range(E.size):
@@ -54,7 +55,7 @@ t = np.linspace(0, 24, E.size, endpoint=False)
 plt.plot(t, E, '.r-')
 message = f"Voltage generated at {point_pair}"
 plt.title(message)
-plt.axis([0,24,-2,2])
+plt.axis([0,24,-50,50])
 plt.xlabel('Time (hrs)')
 plt.ylabel('Voltage (mV)')
 #plt.savefig('/home/yajun/Documents/treePower/figs/' + 'StempK' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')
