@@ -14,7 +14,7 @@ c = temp(config)
 
 to test parameter:
 run heat1dK
-for j in range(1,50):
+for j in range(1,50,5):
     config['at_point'] = j
     c = temp(config)
     

@@ -33,7 +33,7 @@ config['output'] = 'temp'
 config['visualization dimension'] = 2
 soln = temp(config)
 
-point_pair = [1,-2]
+point_pair = [20,-3]
 soln_diff = soln[:,point_pair[0]]-soln[:,point_pair[1]]
 
 import source as stree # source term at bdry 

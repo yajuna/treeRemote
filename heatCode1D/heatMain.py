@@ -130,7 +130,7 @@ def temp(config):
         plt.plot(t, soln_diff, '.r-')
         message = f"Temperature Difference at grid points {point_pair}"
         plt.title(message)
-        plt.axis([0,24,-0.1,0.1])
+        plt.axis([0,24,-1,1])
         plt.xlabel('Time (hrs)')
         plt.ylabel('Temperature Difference (K)')
 #        plt.savefig('/home/yajun/Documents/treePower/figs/' + 'StempK' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')

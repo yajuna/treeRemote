@@ -5,7 +5,7 @@ Created on Tue Nov  3 20:07:33 2020
 
 An efficient code to spit out time that gives the max temp differences
 
-combines heat1dK.py and tempMax.py
+with heat1dK.py and tempMax.py; modify and use heatMain.py
 
 Find the index of N max elements. For Numpy version higher than 1.8 (currently 1.18.4)
 https://stackoverflow.com/questions/6910641/how-do-i-get-indices-of-n-maximum-values-in-a-numpy-array
@@ -18,15 +18,15 @@ from scipy import sparse
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D # matplotlib version 3.1.0
 # import source terms and bdry conditions
-from sourceS import * # source term at bdry
-from Temp_dataVec import * # boundary at tree bark
+import source as stree # source term at bdry
+import TNTvec as tntv # boundary at tree bark
 
 config = dict()
 
 config['timeSteps'] = 1000 # n
 mu,sigma = 1, 0.001 # mean and standard deviation
 config['thermalConductivity'] = 0.12*np.ones(12) # k
-config['heatCapacity_rhoc'] = 1.7  # rhoc
+config['heatCapacity_rhoc'] = 510*1380  # rhoc
 config['time'] = np.linspace(0, 1000, 50, endpoint = False)
 
 m = 75 # number of grid points
@@ -35,18 +35,18 @@ m = 75 # number of grid points
 
 # initial condition being const. temp at 7 am
 def eta(m):
-    return ((56 - 32) * 5/ 9 + 273.15) * np.ones(m)
+    return 300.40 * np.ones(m)
 
 ## tree center bdry condition is homogeneous Neumann condition. In matrix
 
 ## tree bark with Dirichlet condition for temperature
 def g1(t):
-    return tTemp[t]
+    return tntv.bdryArray[t]
 
 # source term at tree bark
 def gs(t):
     
-    return sourceTermsSvalue(t)
+    return stree.sourceTerm[t]
 
 #%% main function
 
@@ -55,10 +55,10 @@ def tempTime(m):
     n = 1000
     k = 0.12*np.ones(12)
     k = np.asarray(k)
-    rhoc = 1.7
+    rhoc = 510*1380
     
-    r = np.linspace(0, 1, m, endpoint=False)
-    t = np.linspace(0, 12, n, endpoint=False)
+    r = np.linspace(0, 0.36 * 0.5, m, endpoint=False)
+    t = np.linspace(0, 24, n, endpoint=False)
     
     dr = r[1] - r[0]
     dt = t[1] - t[0]
@@ -118,14 +118,14 @@ def tempTime(m):
 
 # to find the time for two max temp replace 2 by N to find N max values
     ind = np.argpartition(tempDiff, -2)[-2:]
-    print("Max temperature difference occurs at", ind, "time step", "with grid point number ", m, ", the difference is", tempDiff[ind])   
+    print("Max temperature difference occurs at", ind, "time step", "with grid point number ", m, ", the difference is", tempDiff[ind], " at ", ind)   
          
-    print("Temperature of center and tree bark as a function of time", tempDiff)
+#    print("Temperature of center and tree bark as a function of time", tempDiff)
     return 
 
 #%% for loop to get time for max temp difference
     
-for m in range(50, 500, 50):
+for m in range(50, 500, 20):
     tempTime(m)
     
 

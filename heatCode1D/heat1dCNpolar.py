@@ -22,6 +22,13 @@ Update issues:
     observation: when chaning gridPoints from 50 to 500, figures do not coincide (eg. 380/500
     and 38/50 are not the same).
     2. variable conductivity
+    
+to test parameters:
+run heat1dCNpolar
+
+for j in range(1,50,5):
+    config['at_point'] = j
+    c = temp(config)    
 @author: yajun
 """
 import numpy as np # version 1.16.4
