@@ -119,7 +119,7 @@ hVec = []
 bdry = []
 
 for j in range(1000):
-    param = {"Ta": coreTemp[j], "Va": windSpeed[j], "qrads": 650, "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.11,
+    param = {"Ta": coreTemp[j], "Va": windSpeed[j], "qrads": 650, "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.12,
          "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.18,
          "L": 10, "DeltaT": 2, "DeltaR": 100/1000, "timeSteps": 1000}
     h, Tb = chtbt()
