@@ -108,17 +108,18 @@ def chtbt():
     Tbfinal = Tb # Tb - 273.2 if celsius
     return h, Tbfinal
 
-#%%
-barkTemp = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.barkTemp16np.size),cR.barkTemp16np)
-coreTemp = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.coreTemp16np.size),cR.coreTemp16np)
-diffTemp = barkTemp - coreTemp
-
+#%% weather data collected
 windSpeed = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.windspeed16np.size),cR.windspeed16np)
+albedo = .3  # "For albedo, we assumed a value of 0.3" - Potter Anderson page 3
 radiation = (1 - albedo) * np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.solar16np.size), cR.solar16np)
-
 
 hVec = []
 bdry = []
+
+#%% Tb generated with experimental data
+barkTemp = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.barkTemp16np.size),cR.barkTemp16np)
+coreTemp = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.coreTemp16np.size),cR.coreTemp16np)
+diffTemp = barkTemp - coreTemp
 
 for j in range(1000):
     param = {"Ta": coreTemp[j], "Va": windSpeed[j], "qrads": radiation[j], "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.12,
@@ -131,3 +132,17 @@ for j in range(1000):
 hArray = np.asarray(hVec)
 bdryArray = np.asarray(bdry)
 
+#%% Tb generated with estimate data (no measurements of tree temp)
+tempAir = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.temp16np.size),cR.temp16np)
+deltaT = np.average(diffTemp)
+
+for j in range(1000):
+    param = {"Ta": tempAir[j], "Va": windSpeed[j], "qrads": radiation[j], "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.12,
+         "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.18,
+         "L": 10, "DeltaT": deltaT, "DeltaR": 100/1000, "timeSteps": 1000}
+    h, Tb = chtbt()
+    hVec.append(h)
+    bdry.append(Tb)
+    
+hArray = np.asarray(hVec)
+bdryArray = np.asarray(bdry)
