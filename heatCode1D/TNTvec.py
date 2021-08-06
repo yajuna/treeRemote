@@ -109,10 +109,10 @@ def chtbt():
     return h, Tbfinal
 
 #%%
-#barkTemp = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.barkTemp16np.size),cR.barkTemp16np)
-    
-
+barkTemp = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.barkTemp16np.size),cR.barkTemp16np)
 coreTemp = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.coreTemp16np.size),cR.coreTemp16np)
+diffTemp = barkTemp - coreTemp
+
 windSpeed = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.windspeed16np.size),cR.windspeed16np)
 radiation = (1 - albedo) * np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.solar16np.size), cR.solar16np)
 
@@ -123,7 +123,7 @@ bdry = []
 for j in range(1000):
     param = {"Ta": coreTemp[j], "Va": windSpeed[j], "qrads": radiation[j], "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.12,
          "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.18,
-         "L": 10, "DeltaT": 2, "DeltaR": 100/1000, "timeSteps": 1000}
+         "L": 10, "DeltaT": diffTemp[j], "DeltaR": 100/1000, "timeSteps": 1000}
     h, Tb = chtbt()
     hVec.append(h)
     bdry.append(Tb)
