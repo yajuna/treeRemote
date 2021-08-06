@@ -39,9 +39,6 @@ from scipy.optimize import broyden1
 
 import csvReader as cR
 
-
-
-    
 """
 interpretate coreTemp16npinte and windspeed16npinte data, then
 
@@ -103,7 +100,7 @@ def heatTransferCoeff(**param):
     Nu = C * (Re ** m) * Pr ** (1 / 3)  # Nusselt number
     return Nu * Ka / (rb * 2)  # W/m2-k heat transfer coefficient
 
-Tbinit = 22 + 273.2
+Tbinit = 300.40 #22 + 273.2
 
 def chtbt():
     h = heatTransferCoeff(**param)
