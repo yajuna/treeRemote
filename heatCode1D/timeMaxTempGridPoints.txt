@@ -1,0 +1,38 @@
+## results from running EffTimeMax.py
+
+## tempDiff between center grid point and tree bark grid point. 
+
+configurations: 
+
+config['timeSteps'] = 1000 # n
+mu,sigma = 1, 0.001 # mean and standard deviation
+config['thermalConductivity'] = 0.12*np.ones(12) # k
+config['heatCapacity_rhoc'] = 1.7  # rhoc
+config['time'] = np.linspace(0, 1000, 50, endpoint = False)
+
+
+### variable configuration
+config['gridPoints'] = m
+m in range(50, 500, 50)
+
+Max temperature difference occurs at [249 250] time step with grid point number  50 , the difference is [14.15334265 14.16288089]
+Max temperature difference occurs at [249 250] time step with grid point number  100 , the difference is [8.6548791  8.66293245]
+Max temperature difference occurs at [249 250] time step with grid point number  150 , the difference is [6.76018136 6.76876381]
+Max temperature difference occurs at [249 250] time step with grid point number  200 , the difference is [5.80098075 5.81008824]
+Max temperature difference occurs at [251 250] time step with grid point number  250 , the difference is [5.2221978  5.23083036]
+Max temperature difference occurs at [251 250] time step with grid point number  300 , the difference is [4.83861623 4.84178973]
+Max temperature difference occurs at [249 251] time step with grid point number  350 , the difference is [4.56133099 4.56627149]
+Max temperature difference occurs at [249 251] time step with grid point number  400 , the difference is [4.3578433  4.36432145]
+Max temperature difference occurs at [253 251] time step with grid point number  450 , the difference is [4.20180694 4.20945934]
+
+## Look at other grid point differences?
+
+
+
+
+
+
+ 
+
+
+

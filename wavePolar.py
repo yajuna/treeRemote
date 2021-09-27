@@ -21,7 +21,7 @@ from mpl_toolkits.mplot3d import Axes3D
 #%% Parameters
 Nr = 50
 N_phi = 50
-N_steps = 1000
+N_steps = 200
 radius = 5.
 c = 0.5
 dphi = 2*np.pi/N_phi
@@ -51,13 +51,15 @@ for t in range(2, N_steps):
             ri = max(r[i], 0.5*dr)  # To avoid the singularity at r=0
             k2 = c*dt**2/(2*ri*dr)
             k3 = c*dt**2/(dphi*ri)**2
+    
             T[t, i, j] = 2*T[t-1, i, j] - T[t-2, i, j] \
             + k1*(T[t-1, i+1, j] - 2*T[t-1, i, j] + T[t-1, i-1, j])\
             + k2*(T[t-1, i+1, j] - T[t-1, i-1, j])\
             + k3*(T[t-1, i, j+1] - 2*T[t-1, i, j] + T[t-1, i, j-1])
 
         T[t, i, -1] = T[t, i, 0]  # Update the values for phi=2*pi
-
+#        print(k2,k3,i)
+    print(np.max(abs(T[t,:,:])),t)
 #%% visualization with matplolib BUGGY, NEED TO FIX
 #fig = plt.figure()
 #ax = fig.gca(projection='3d')

@@ -72,7 +72,12 @@
 \noindent Key words: 
 
 
-\section*{Introduction}  \textcolor{red}{Literature review:}
+\section*{Introduction}  
+Thermoelectric devices has been used in several projects [\ref{thermoelectric}], \textcolor{red}{add Orlando's ref}. Such devices convert energy from temperature difference to electricity, and power up small hardwares. In Washington state, we harvest energy from tree trunks, and power up devices that collect information of pollution in the nearby area.
+
+In this work, we consider the numerical modeling of temperature distribution in tree trunks in the Washington area. Our result should provide reference for polution device design. 
+
+\textcolor{red}{Literature review:}
 
 
 
@@ -81,38 +86,32 @@
 %With these assumptions, the DE problem reduces to 1D.
 \begin{enumerate}
 \item We assume all trees we consider are roughly the same. That means same height, same radius
-\item With the previous assumption, we place all devices at the same height, and same depth
+\item With the previous assumption, we place all devices at the same height (therefore eliminating the $z$ variable in the heat equation), and same depth
 \end{enumerate}
 
-\section{To do (March)}
+\section{To do (Summer)}
 \begin{enumerate}
-\item get heat program running in Python3 (eliminate all syntax error)
-\item find appropriate parameters for testing
-\item think of ways to validate computation (analytical solution, similar and simpler problem)
-\item write a documentation (i.e., this file??)
+\item run experiments in Python3, see similar results from Potter and Andersen. 
+\begin{itemize}
+\item study source terms
+\item improve 2D heat code with CN-method, and ADT method.
+\end{itemize}
+\item find appropriate parameters for testing (ask hardware group)
+\item ways to validate computation (numerical analysis methods)
+\item fill in documentation with theory, data, numertical methodology, and numerical experiments. 
 \end{enumerate}
 
-\section{PDE model of temperature within a tree stem}
-\subsection{Parameters \textcolor{red}{ to collect and verify. Nick}}
-Notations: 
-\begin{enumerate}
-\item $T$: temperature (K)
-\item $\rho$: density (kg/m$^3$)
-\item $c$: specific heat (J/(kgK))
-\item $t$: time (s)
-\item $k$: thermal conductivity (W/(mK))
-\item $r$: distance from center of the tree (m)
-\item $\phi$: azimuth angle, measured clockwise with south being $\phi=0$ (radian/degree), [\ref{heat}] assumes $\partial k/\partial \phi=0$
-\item $\alpha$: albedo of the surface
-\end{enumerate}
-
-\subsection{The heat equation in cylindrical coordinates}
-The standard heat equation for temperature distribution in cylindrical coordinates is 
+\section{PDE model of temperature within a tree trunk}
+Heat transfers witinin the tree trunk vertically, radially, and might differ at different azimuth angle. To fully model the temperature distribution within a tree trunk, we need to study the heat equation in three dimensions. 
 \begin{equation}
-\rho c\frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\frac{1}{r}\frac{\partial}{\partial \phi}\bigg(\frac{k}{r}\frac{\partial T}{\partial \phi}\bigg)\label{heat}
+\rho c \frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)+\text{ source term}=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\frac{1}{r}\frac{\partial}{\partial \phi}\bigg(\frac{k}{r}\frac{\partial T}{\partial \phi}\bigg)+\frac{\partial}{\partial z}\bigg(k\frac{\partial T}{\partial z}\bigg)+\text{ source term}\label{heat3d}
+\end{equation}
+However, for our application, we can greatly simplify the equation with reasonable assumptions. As our devices would be installed in forests with trees of similar age and growth, it is reasonable to assume that we install all devices at the same height- this eliminates the dependence on the height ($z$- variable). We therefore obtain the following standard heat equation for temperature distribution in two dimensional cylindrical coordinates:
+\begin{equation}
+\rho c\frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)+\text{ source term}=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\frac{1}{r}\frac{\partial}{\partial \phi}\bigg(\frac{k}{r}\frac{\partial T}{\partial \phi}\bigg)+\text{ source term}\label{heat2d}
 \end{equation}
 
-We add source terms for the diffusion equation to obtain
+We add details of source terms for the diffusion equation to obtain
 \begin{equation}
 \rho c\frac{\partial T}{\partial t}=\nabla\cdot(k\nabla T)-\frac{1}{\Delta r}[H+(1-\alpha)(S_{dir}+S_{dif})+(IR_{in}-IR_{out})]
 \end{equation}
@@ -135,24 +134,45 @@ more details in \ref{heat}.
 \item $IR_{in}-IR_{out}$ represents wave radiation from and to the tree. More details see [\ref{heat}].
 
 \end{enumerate}
+We modify above source terms to fit the parameters for trees in Washington state.
 
-In this work, we solve the heat equation to model the temperature in tree trunks, for the purpose of energy harvesting. We modify above source terms to fit the parameters for trees in Washington state.
+\subsection{Parameters \textcolor{red}{to collect and verify. Hardware group}}
+Notations: 
+\begin{enumerate}
+\item $T$: temperature (K)
+\item $\rho$: density (kg/m$^3$)
+\item $c$: specific heat (J/(kgK))
+\item $t$: time (s)
+\item $k$: thermal conductivity (W/(mK))
+\item $r$: distance from center of the tree (m)
+\item $\phi$: azimuth angle, measured clockwise with south being $\phi=0$ (radian/degree), [\ref{heat}] assumes $\partial k/\partial \phi=0$
+\item $\alpha$: albedo of the surface
+\end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Furthur simplification to one dimensional equation}
+Although we will be working mostly with the above two dimensional heat equation, [\ref{heat}] provides justification for further reducing the above problem to one dimensional case. As seen in Fig. 2 of [\ref{heat}], biggest temperature difference occurs in south and west asepcts. In our hardware application, we seek to install our devices in the aspects with the highest temperature differences. Based on the location of Washington state \textcolor{red}{and data from hardware group}, we install all devices in the south of the tree trunks. This furthur reduces the heat equation to solve to a one dimensional problem
+
+\begin{equation}
+\rho c\frac{\partial T}{\partial t}=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg)+\text{ source term}=k\frac{1}{r}\frac{\partial T}{\partial r}+k\frac{\partial^2T}{\partial r^2}+\text{ source term}.\label{heat1d}
+\end{equation}
+
+In the following, we discuss the numerical simulation of both two and one dimensional heat equations with several numerical schemes. 
 
 
+%\href{https://pycav.readthedocs.io/en/latest/api/pde/crank_nicolson.html}{ref for CN 2D}
 
-\textcolor{red}{https://pycav.readthedocs.io/en/latest/api/pde/crank\_nicolson.html}
+\section{Finite Difference schemes for the heat equation}
+We discuss Finite Difference (FD) schemes for both two and one dimensional heat equation, as the FD method is simple to implement, and robust.  
 
-\subsection{FD scheme for the heat equation}
-We solve the above equation numerically with the Finite-Difference (FD) method, as the FD method is simple to implement, and robust.  
-
+\subsection{FD schemes for the two dimensional heat equation}
 A detailed discussion on axi-symmetric heat equation is in [\ref{2017book}]. We model the heat equation to depend on the azimuth angle $\phi$, as trees in Washington state experience different sunlight and therefore growth in different direction. \textcolor{red}{pg.251, section 3.5.6}
 
-For simplicity of discussion, we assume $\rho,\ c, k$ are all constants for now. Then the constant coefficient equation \eqref{heat} simplifies to 
+For simplicity of discussion, we assume $\rho,\ c, k$ are all constants. This is a reasonable assumption, as the trees should not have parameters that change drastically within the trunk. Then the constant coefficient equation \eqref{heat2d} simplifies to 
 \begin{equation}
 \frac{\rho c}{k}\frac{\partial T}{\partial t}=\frac{\partial^2 T}{\partial r^2}+\frac{1}{r}\frac{\partial T}{\partial r}+\frac{1}{r^2}\frac{\partial^2 T}{\partial \phi^2}\label{simple_heat}
 \end{equation}
 
-With centered FD discretization in time and space, we have
+With centered FD discretization in space, and forward in time for example, we have
 \begin{itemize}\begin{multicols}{2}
 \item $\frac{\partial T}{\partial t}\approx\frac{T^1_{i,j}-T^0_{i,j}}{\Delta t}$
 \item $\frac{\partial T}{\partial r}\approx\frac{T^0_{i+1,j}-T^0_{i-1,j}}{2\Delta r}$
@@ -160,17 +180,26 @@ With centered FD discretization in time and space, we have
 \item $\frac{\partial^2 T}{\partial \phi^2}\approx\frac{T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}}{(\Delta \phi)^2}$
 \end{multicols}\end{itemize}
 
-Here $T^n_{i,j} \approx T(r_i,\phi_j,t_n)$ denotes the numerical solution at the point $(r_i,\phi_j,t_n)$. Then the above {\it continuous differential equation} becomes the following {\it discrete difference equation}:
+Here $T^n_{i,j} \approx T(r_i,\phi_j,t_n)$ denotes the numerical solution at the point $(r_i,\phi_j,t_n)$. In general, we compute the heat equation iteratively in time with the general time forwarding scheme: 
+\begin{equation}
+\frac{T^1_{i,j}-T^0_{i,j}}{\Delta t}=D\ T_{i,j},
+\end{equation}
+where the right hand side is a discretization in space, with $D$ being the difference operator. Depending on $D$, the above {\it continuous differential equation} can be discretized in the following two ways:
+\subsubsection{Forward in time, centered difference Method (FTCS)}
+The FTCS is the most straightforward method, where we directly apply the above listed discretization to the heat equation. 
 \begin{align}
-T^1_{i,j}=& \frac{k\Delta t}{\rho c}\bigg[\frac{1}{(\Delta r)^2}\bigg(T^0_{i-1,j}+T^0_{i+1,j}-2T^0_{i,j}\bigg)+\frac{1}{2r_i\Delta r}\bigg(T^0_{i+1,j}-T^0_{i-1,j}\bigg)\nonumber\\
-+&\frac{1}{r_i^2(\Delta \phi)^2}\bigg(T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}\bigg)\bigg]+T^0_{i,j},
+T^1_{i,j}=& \frac{k\Delta t}{\rho c}\bigg[\underbrace{\frac{1}{(\Delta r)^2}\bigg(T^0_{i-1,j}+T^0_{i+1,j}-2T^0_{i,j}\bigg)}_{\frac{\partial^2T}{\partial r^2}}+\underbrace{\frac{1}{2r_i\Delta r}\bigg(T^0_{i+1,j}-T^0_{i-1,j}\bigg)}_{\frac{1}{r}\frac{\partial T}{\partial r}}\nonumber\\
++& \underbrace{\frac{1}{r_i^2(\Delta \phi)^2}\bigg(T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}\bigg)}_{\frac{1}{r^2}\frac{\partial^2 T}{\partial \phi^2}}\bigg]+T^0_{i,j},
 \end{align}
 with $k_1= \frac{k\Delta t}{\rho c(\Delta r)^2}$, $k_2 = \frac{k\Delta t}{2\rho cr_i\Delta r}$, and $k_3= \frac{k\Delta t}{\rho cr_i^2(\Delta \phi)^2}$, above equation can be implemented as
 \begin{equation}
 T^1_{i,j}= k_1\bigg(T^0_{i-1,j}+T^0_{i+1,j}-2T^0_{i,j}\bigg)+k_2\bigg(T^0_{i+1,j}-T^0_{i-1,j}\bigg)
 +k_3\bigg(T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}\bigg)+T^0_{i,j},
 \end{equation}
-where we obtain $T^1_{i,j}$ each time step with $T$ values in several locations from previous step. 
+where we obtain $T^1_{i,j}$ each time step with $T$ values in several locations from previous step. This system of equations can be solved directly. See implementation (that needs modification) in {\tt heatPolar.py}. Here we can denote the general scheme to be 
+\begin{equation}
+\frac{T^1_{i,j}-T^0_{i,j}}{\Delta t}=D\ T^0_{i,j}.
+\end{equation}
 
 \begin{center}\begin{tikzpicture}
   \stencilpt{-2,0}{i-2}{$T^0_{i-1,j}$};
@@ -184,36 +213,162 @@ where we obtain $T^1_{i,j}$ each time step with $T$ values in several locations 
 
 Space information at each time step.
 \end{center}
-Image one more axis normal to the paper, pointing outwards above the blue dot. That would be $T^1_{i,j}$. 
+Imagine one more axis normal to the paper, pointing outwards above the blue dot. That would be $T^1_{i,j}$. 
 
-%For future: tikz image: 
-%
-%\newcommand{\stencilpt}[4][]{\node[circle,draw,inner sep=0.1em,minimum size=0.8cm,font=\tiny,#1] at (#2) (#3) {#4}}
-%\begin{tikzpicture}
-%  \stencilpt{-2,0}{i-2}{$-1/12$};
-%  \stencilpt{-1,0}{i-1}{$4/3$};
-%  \stencilpt{ 0,0}{i}  {$-5$};
-%  \stencilpt{ 1,0}{i+1}{$4/3$};
-%  \stencilpt{ 2,0}{i+2}{$-1/12$};
-%  \stencilpt{0,-2}{j-2}{$-1/12$};
-%  \stencilpt{0,-1}{j-1}{$4/3$};
-%  \stencilpt[blue]{0, 1}{j+1}{$4/3$};
-%  \stencilpt{0, 2}{j+2}{$-1/12$};
-%  \draw (j-2) -- (j-1)
-%        (j-1) -- (i)
-%        (i)   -- (j+1)
-%        (j+1) -- (j+2)
-%        (i-2) -- (i-1)
-%        (i-1) -- (i)
-%        (i)   -- (i+1)
-%        (i+1) -- (i+2);
-%\end{tikzpicture}
+\subsubsection{Crank-Nicolson Method (CNM)}
+We also solve the heat equation with the Crank-Nicolson method, as it is easy to modify given the FTCS method. To put simply, the general scheme is modified by averaging the space information of the current step and the next step:
+\begin{equation}
+\frac{T^1_{i,j}-T^0_{i,j}}{\Delta t}=\frac{1}{2}D\ T^0_{i,j}+\frac{1}{2}D\ T^1_{i,j}.
+\end{equation}
+The specific scheme is 
+\begin{align}
+& T^1_{i,j}-0.5k_1\bigg(T^1_{i-1,j}+T^1_{i+1,j}-2T^1_{i,j}\bigg)-0.5k_2\bigg(T^1_{i+1,j}-T^1_{i-1,j}\bigg)
+-0.5k_3\bigg(T^1_{i,j-1}+T^1_{i,j+1}-2T^1_{i,j}\bigg)\nonumber\\
+&= 0.5k_1\bigg(T^0_{i-1,j}+T^0_{i+1,j}-2T^0_{i,j}\bigg)+0.5k_2\bigg(T^0_{i+1,j}-T^0_{i-1,j}\bigg)
++0.5k_3\bigg(T^0_{i,j-1}+T^0_{i,j+1}-2T^0_{i,j}\bigg)+T^0_{i,j},
+\end{align}
+here $k_1,\ k_2,\ k_3$ are previously defined. 
+
+\subsection{FD schemes for the one dimensional heat equation}
+
+\textcolor{red}{Discussion with Orlando: should we use $\rho c\frac{\partial T}{\partial t}=k\frac{1}{r}\frac{\partial T}{\partial r}+k\frac{\partial^2T}{\partial r^2}$ or $\rho c\frac{\partial T}{\partial t}=k\frac{\partial^2T}{\partial r^2}$}
+
+For the one dimensional heat equation, we apply centered-difference and Crank-Nicholson methods. 
+
+centered difference:
+$$(U^{n+1}_i - U^n_i)/k = 1/h^2 (U^n_{i-1} - 2U^n_i + U^n_{i+1})$$
+
+CN:
+$$(U^{n+1}_i - U^n_i)/k = 1/2 (D^2U^n_i + D^2U^{n+1}_i) 
+=1/2h^2(U^n_{i-1} - 2U^n_i + U^n_{i+1} + U^{n+1}_{i-1} - 2U^{n+1}_i + U^{n+1}_{i+1})$$  
+
+rewrite to be ($r=k/2h^2$)
+$$-r U^{n+1}_{i-1} + (1+2r) U^{n+1}_i - r U^{n+1}_{i+1} = 
+r U^n_{i-1} + (1-2r) U^n_i + r U^n_{i+1}$$
+
+\subsection{Discretization of the heat equation in 1D polar form}
+The full IBVP we seek to solve is the following
+\begin{equation}
+\begin{cases} \rho c\frac{\partial T}{\partial t}=\frac{1}{r}\frac{\partial}{\partial r}\bigg(kr\frac{\partial T}{\partial r}\bigg) + \frac{1}{\Delta r}g_s(t)\\
+\frac{\partial T(r,t)}{\partial r}\bigg|_{r=0} = 0,\ T(r,t)\bigg|_{r = R} = g_1(t)\\
+T(r,0) = \text{temperature in tree trunk at 7 am}
+\end{cases}
+\end{equation}
+
+Let $T^n_{i} \approx T(r_i,t_n)$ denote the numerical solution at the point $(r_i,t_n)$, $\Delta t$ the time step, and $\Delta r$ grid size. 
+With second order central difference in space 
+\begin{equation}\frac{\partial T}{\partial r}\approx\frac{T_{i+1}-T_{i-1}}{2\Delta r}\end{equation}
+\begin{equation}\frac{\partial^2 T}{\partial r^2}\approx\frac{T_{i-1}-2T_{i}+T_{i+1}}{(\Delta r)^2}\end{equation}
+and first order forward in time
+\begin{equation}\frac{\partial T}{\partial t}\approx\frac{T^1-T^0}{\Delta t},\end{equation}
+we obtain the Crank-Nicolson method by averaging the above spatial differences in time:
+\begin{align}
+&(T^{n+1}_i - T^n_i)/\Delta t = 1/(4ar_i\Delta r)(T^n_{i+1}-T^n_{i-1} + T^{n+1}_{i+1}-T^{n+1}_{i-1} )\nonumber\\
+&+1/(2a(\Delta r)^2)(T^n_{i-1} - 2T^n_i + T^n_{i+1} + T^{n+1}_{i-1} - 2T^{n+1}_i + T^{n+1}_{i+1}),\label{1dCNscheme}
+\end{align}
+where $a = \frac{\rho c}{k}$.
+
+We implement boundary conditions in the numerical scheme. For the boundary at the center of the tree, we follow the same no-flux Neumann condition in \ref{firestem2d}. We use the second order central difference approximation at $r=0$: 
+\begin{equation}
+    \frac{\partial T}{\partial r}\bigg|_{r=0}\approx \frac{T_2-T_0}{2\Delta r}=0.
+\end{equation} % should try with Dirichlet conditions as well, if more info of temperature is known. Our original modeling still makes sense: center temperature is const + small oscillation.
+Equation \eqref{1dCNscheme} gives a representation for the ghost cell value $T_0$ in terms of $T_2$. When implementing, we replace $T_0$ by $T_2$ in \label{1dCNscheme} when $i=1$. It is implemented in the first row of the matrix below. 
+
+For the outer boundary condition at the surface of the tree, we implement the source term from the previous section as a Dirichlet condition
+\begin{equation}
+    T(r,t)\bigg|_{surface}=g_1(t).
+\end{equation}
+We again introduce a ghost cell at $T_{M+1}$ in \label{1dCNscheme}, with $T^1_{M} = g_1(t)$, and $T^1_{M+1} = g_1(t+\Delta t)$.  
+It is inplemented the last row of the following matrix equation.
+
+The source term $g_s(t)$ is only present at the boundary. To discretize the source term, we have the following vector \ref{salsa}
+\begin{equation}
+G_s(t)=
+\begin{pmatrix}
+0\\
+0\\
+\vdots\\
+0\\
+g_s(t)
+\end{pmatrix}
+\end{equation}
+To match with the continuous problem, we multiply $G_s(t)$ by $\frac{\Delta t}{ak\Delta r}$. 
 
 
+Together, we solve the following system to compute the heat distribution in the tree trunk: % ref: a primer to PDEs, Salsa et al
+\begin{equation*}
+    \left( \begin{array}{cccc}
+1+\beta & -\beta & & 0\\
+\alpha_2 & 1+\beta & -\gamma_2 & \\
+\ddots& \ddots & \ddots  & \\
+& \alpha_{m-1} & 1+\beta & -\gamma_{m-1} \\
+0 & & \alpha_m & 1+\beta \end{array} \right)\left(\begin{array}{c}
+     T^1_1  \\
+     T^1_2 \\
+     \vdots\\
+     T^1_{m-1}\\
+     T^1_m
+\end{array}\right)=\end{equation*}
+\begin{equation}\left( \begin{array}{cccc}
+1-\beta & \beta & & 0\\
+-\alpha_2 & 1-\beta & \gamma_2 & \\
+\ddots& \ddots & \ddots  & \\
+& -\alpha_{m-1} & 1-\beta & \gamma_{m-1} \\
+0 & & -\alpha_m & 1-\beta \end{array} \right)\left(\begin{array}{c}
+     T^0_1  \\
+     T^0_2 \\
+     \vdots\\
+     T^0_{m-1}\\
+     T^0_m
+\end{array}\right)+\left(\begin{array}{c}
+     0  \\
+     0 \\
+     \vdots\\
+     0\\
+     rhs(M)
+\end{array}\right)
+\end{equation}
+where \begin{equation}rhs(M)=
+\gamma_m(g_1(t)+g_1(t+\Delta t))+\frac{\Delta t}{2ak\Delta r}(g_s(t)+g_s(t+\Delta t)),\nonumber\end{equation}
+$\alpha_i = \frac{\Delta t}{4ar_i\Delta t}-\frac{\Delta t}{2a(\Delta r)^2}$, $\beta = \frac{\Delta t}{a(\Delta r)^2}$, and $\gamma_i = \frac{\Delta t}{4ar_i\Delta t}+\frac{\Delta t}{2a(\Delta r)^2}$. %
 
-\textcolor{red}{with centered difference in time. Will modify to be Crank-Nicolson}
+If the boundary condition is Neumann $$\frac{\partial T}{\partial r}\bigg|_{r=\text{ surface}} = g_1(t),$$ than the last row of above matrix equation should change to 
 
-\subsection{Implementation in Python and numerical results}
+\begin{equation}
+\begin{pmatrix}
+\vdots & & \vdots & \vdots\\
+0 & & -\beta &\ 1+\beta)\end{pmatrix}\begin{pmatrix}\vdots\\
+T^1_m\end{pmatrix}= \end{equation}
+\begin{equation}
+\begin{pmatrix}
+\vdots & & \vdots & \vdots\\
+0 & & \beta &\ 1+\beta)\end{pmatrix}\begin{pmatrix}\vdots\\T^0_m\end{pmatrix} +
+\begin{pmatrix}\vdots\\
+ rhs(M)\end{pmatrix}\end{equation}
+where \begin{equation}rhs(M)=
+2\Delta r\gamma_m(g_1(t)+g_1(t+\Delta t))+\frac{\Delta t}{2ak\Delta r}(g_s(t)+g_s(t+\Delta t)),\nonumber\end{equation}
+
+\section{Implementation in Python and numerical results}
+\textcolor{red}{Record numerical results here}
+
+With the FTCS method, we need to worry about numerical stability. By the von Neumann stability analysis, we write $T(r,\phi, t_n)=e^{ikr+il\phi}$, and $T(r,\phi, t_{n+1})=Ge^{ikr+il\phi}$. We force $G\leq 1$. Plug $T(r,\phi, t_n)=T^0_{i,j}$ and $T(r,\phi, t_{n+1})=T^1_{i,j}$ into the Finite Difference equation, we get (we will temporarily denote $c=\frac{k}{\rho c}$)
+\begin{equation}
+G = c\Delta t \bigg[\frac{1}{(\Delta r)^2}(e^{-ik\Delta r}+e^{ik\Delta r}-2)+\frac{1}{2r_i\Delta r}(e^{ik\Delta r}-e^{-ik\Delta r})+\frac{1}{(r_i\Delta \phi)^2}(e^{-il\Delta \phi}+e^{il\Delta \phi}-2)\bigg]+1
+\end{equation}
+As $r_i\geq \Delta r$, we replace all $r_i$ with $\Delta r$, and we get 
+\begin{equation}
+G\leq c\Delta t \bigg[\frac{1}{(\Delta r)^2}(2\cos(k\Delta r)-2)+\frac{1}{2(\Delta r)^2}2i\sin(k\Delta r)+\frac{1}{(\Delta r\Delta \phi)^2}(2\cos(l\Delta \phi)-2)\bigg]+1
+\end{equation}
+We request $|G|\leq 1$, and it comes down to the following inequality:
+\begin{equation}
+\bigg[1-\frac{c\Delta t}{(\Delta r)^2}4\sin^2(k\Delta r/2)-\frac{c\Delta t}{(\Delta r\Delta \phi)^2}4\sin^2(l\Delta \phi/2)\bigg]^2+\bigg[\frac{c\Delta t}{(\Delta r)^2}\sin(k\Delta r)\bigg]^2\leq 1
+\end{equation}
+Worst case is when $k\Delta r = l\Delta \phi = \pi$, and we get the stability requirement: 
+\begin{equation}
+\bigg(1-\frac{c\Delta t}{(\Delta r)^2}4-\frac{c\Delta t}{(\Delta r\Delta \phi)^2}4\bigg)^2\leq 1
+\end{equation}
+
+
 For vectorization, we rewrite the above equation as 
 \begin{equation}
 T^1_{i,j}= (k_1-k_2)T^0_{i-1,j}+(k_1+k_2)T^0_{i+1,j}+(1-2k_1-2k_3)T^0_{i,j}+
