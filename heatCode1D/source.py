@@ -25,7 +25,15 @@ solar = (1 - albedo) * np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.sol
 blackbody = sigma * (tempAir**4 - tntv.bdryArray**4) # Tair^4 - Tsfc^4
 
 
-convect = tntv.hArray * (tntv.bdryArray - tempAir)
+convect = tntv.hArray * (tntv.bdryArray - tempAir) # Tsfc - Tair
 
 sourceTerm = solar + blackbody + convect
+
+## Change source term to negative
+#sourceTerm = - sourceTerm
+
+## 
+
+barkTemp = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.barkTemp16np.size),cR.barkTemp16np)
+
 

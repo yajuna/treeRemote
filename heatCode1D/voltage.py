@@ -33,7 +33,7 @@ config['output'] = 'temp'
 config['visualization dimension'] = 2
 soln = temp(config)
 
-point_pair = [20,-3]
+point_pair = [1,-2]
 soln_diff = soln[:,point_pair[0]]-soln[:,point_pair[1]]
 
 import source as stree # source term at bdry 
@@ -58,7 +58,7 @@ plt.title(message)
 plt.axis([0,24,-50,50])
 plt.xlabel('Time (hrs)')
 plt.ylabel('Voltage (mV)')
-#plt.savefig('/home/yajun/Documents/treePower/figs/' + 'StempK' + str(at_point) + '.eps', format='eps', dpi=300,bbox_inches='tight')
+plt.savefig('/home/yajun/Documents/treePower/TNT/TNTfig/' + 'vol' + str(point_pair[0]) +str(point_pair[1]) + '.eps', format='eps', dpi=300,bbox_inches='tight')
 plt.show()    
     
     

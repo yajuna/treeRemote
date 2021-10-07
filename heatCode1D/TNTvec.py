@@ -36,6 +36,7 @@ Conductivity computed by Hee-Seok
 import numpy as np
 from functools import partial
 from scipy.optimize import broyden1
+from matplotlib import pyplot as plt
 
 import csvReader as cR
 
@@ -124,25 +125,72 @@ diffTemp = barkTemp - coreTemp
 for j in range(1000):
     param = {"Ta": coreTemp[j], "Va": windSpeed[j], "qrads": radiation[j], "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.12,
          "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.18,
-         "L": 10, "DeltaT": diffTemp[j], "DeltaR": 100/1000, "timeSteps": 1000}
+         "L": 10, "DeltaT": diffTemp[j], "DeltaR": 100/1000}#, "timeSteps": 1000}
     h, Tb = chtbt()
     hVec.append(h)
     bdry.append(Tb)
     
 hArray = np.asarray(hVec)
 bdryArray = np.asarray(bdry)
+hArrayEx = hArray
+bdryArrayEx = bdryArray
+
+print("h and Tb from experimental data")
+
+#%% visualize
+
+t = np.linspace(0,24,1000,endpoint = False)
+
+plt.plot(t, bdryArrayEx, 'r', label = "Generated")
+
+plt.plot(t,barkTemp,'b',label="Measured") #
+
+plt.legend(loc = 'lower left')
+plt.title('Generated Bark Temperature vs Measured Bark Temperature')
+plt.axis([0,24,290,315])
+plt.xlabel('Time (hrs)')
+plt.ylabel('Temperature (K)')
+plt.savefig('/home/yajun/Documents/treePower/TNT/TNTfig/' + 'PostempDiff' + 'ExBark' + '.eps', format='eps', dpi=300,bbox_inches='tight')
+plt.show()    
+    
+
+#%% Run either lines 121-154, or lines 162-195
+
 
 #%% Tb generated with estimate data (no measurements of tree temp)
-tempAir = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.temp16np.size),cR.temp16np)
-deltaT = np.average(diffTemp)
 
-for j in range(1000):
-    param = {"Ta": tempAir[j], "Va": windSpeed[j], "qrads": radiation[j], "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.12,
-         "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.18,
-         "L": 10, "DeltaT": deltaT, "DeltaR": 100/1000, "timeSteps": 1000}
-    h, Tb = chtbt()
-    hVec.append(h)
-    bdry.append(Tb)
+#tempAir = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.temp16np.size),cR.temp16np)
+#deltaT = np.average(diffTemp)
+#
+#for j in range(1000):
+#    param = {"Ta": tempAir[j], "Va": windSpeed[j], "qrads": radiation[j], "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.12,
+#         "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.18,
+#         "L": 10, "DeltaT": deltaT, "DeltaR": 100/1000, "timeSteps": 1000}    
+#    h, Tb = chtbt()
+#    hVec.append(h)
+#    bdry.append(Tb)
+#    
+#hArray = np.asarray(hVec)
+#bdryArray = np.asarray(bdry)
+#
+#hArrayEs = hArray
+#bdryArrayEs = bdryArray
+#
+#print("h and Tb from estimate data")
+#
+##%% visualize
+#
+#t = np.linspace(0,24,1000,endpoint = False)
+#
+#plt.plot(t, bdryArrayEs, 'r', label = "Estimated")
+#
+#plt.plot(t,barkTemp,'b',label="Measured") #
+#
+#plt.legend(loc = 'lower left')
+#plt.title('Estimated Bark Temperature vs Measured Bark Temperature')
+#plt.axis([0,24,290,305])
+#plt.xlabel('Time (hrs)')
+#plt.ylabel('Temperature ()')
+#plt.savefig('/home/yajun/Documents/treePower/TNT/TNTfig/' + 'tempDiff' + 'EsBark' + '.eps', format='eps', dpi=300,bbox_inches='tight')
+#plt.show()    
     
-hArray = np.asarray(hVec)
-bdryArray = np.asarray(bdry)

@@ -18,6 +18,7 @@ TNTweather: line 4-27, or 6-29?? Data is from Feb 16.
 """
 import pandas
 import numpy as np
+from matplotlib import pyplot as plt
 
 #%% Use data from Feb 16; Feb 15 data maybe incomplete
 
@@ -38,9 +39,38 @@ windspeed16np = np.asarray([float(v) for v in windspeed16])
 solar16 = dataWeather.solar[4:27].tolist()
 solar16np = np.asarray([float(v) for v in solar16])
 
+#%% visualization of ambient temp, windspeed, solar radiation
+
+plt.plot(np.linspace(0,24, temp16np.size, endpoint = False), temp16np, 'r', label = "Ambient temperature")
+plt.legend(loc = 'lower left')
+plt.title('Ambient Temperature')
+plt.axis([0,24,295,305])
+plt.xlabel('Time (hrs)')
+plt.ylabel('Temperature (K)')
+plt.savefig('/home/yajun/Documents/treePower/TNT/TNTfig/' + 'ambTempFig' + '.eps', format='eps', dpi=300,bbox_inches='tight')
+plt.show()  
+
+plt.plot(np.linspace(0,24, windspeed16np.size, endpoint = False), windspeed16np, 'r', label = "Wind speed")
+plt.legend(loc = 'lower left')
+plt.title('Wind Speed')
+plt.axis([0,24,-0.5,6])
+plt.xlabel('Time (hrs)')
+plt.ylabel('Wind speed (m/s)')
+plt.savefig('/home/yajun/Documents/treePower/TNT/TNTfig/' + 'windFig' + '.eps', format='eps', dpi=300,bbox_inches='tight')
+plt.show()
+
+plt.plot(np.linspace(0,24, solar16np.size, endpoint = False), solar16np, 'r', label = "Solar radiation")
+plt.legend(loc = 'lower left')
+plt.title('Solar radiation')
+plt.axis([0,24,400,1100])
+plt.xlabel('Time (hrs)')
+plt.ylabel('Solar radiation (W/m^3)')
+plt.savefig('/home/yajun/Documents/treePower/TNT/TNTfig/' + 'radiationFig' + '.eps', format='eps', dpi=300,bbox_inches='tight')
+plt.show()
+
 #%% Use data from Feb 16; Feb 15 and 19 data maybe incomplete
 
-colnames = ['date1', 'time1', 'coreTemp', 'barkTemp']
+colnames = ['date1', 'time1', 'barkTemp', 'coreTemp']
 
 dataTemp = pandas.read_csv('TNTtemp.csv', names=colnames)
 
@@ -53,3 +83,29 @@ coreTemp16np = np.asarray([float(t) for t in coreTemp16])
 
 barkTemp16 = dataTemp.barkTemp[367:781].tolist()
 barkTemp16np = np.asarray([float(v) for v in barkTemp16])
+
+#%% visualization of measured temperature
+
+plt.plot(np.linspace(0,24, coreTemp16np.size, endpoint = False), coreTemp16np, 'r', label = "Measured Core Temperature")
+plt.legend(loc = 'lower left')
+plt.title('Measured Core Temperature')
+plt.axis([0,24,295,305])
+plt.xlabel('Time (hrs)')
+plt.ylabel('Temperature (K)')
+plt.savefig('/home/yajun/Documents/treePower/TNT/TNTfig/' + 'coreFig' + '.eps', format='eps', dpi=300,bbox_inches='tight')
+plt.show()
+
+plt.plot(np.linspace(0,24, barkTemp16np.size, endpoint = False), barkTemp16np, 'r', label = "Measured Bark Temperature")
+plt.legend(loc = 'lower left')
+plt.title('Measured Bark Temperature')
+plt.axis([0,24,295,305])
+plt.xlabel('Time (hrs)')
+plt.ylabel('Temperature (K)')
+plt.savefig('/home/yajun/Documents/treePower/TNT/TNTfig/' + 'barkFig' + '.eps', format='eps', dpi=300,bbox_inches='tight')
+plt.show()
+
+
+
+
+
+
