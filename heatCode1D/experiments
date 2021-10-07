@@ -1,0 +1,320 @@
+These experiments are performed with data from Joao Pessoa, on mango trees of diameters 36cm (measured at 18cm in diameter; new experiments with measurements at core and bark)
+
+data sets are:
+TNTweather.csv
+## weather data on Feb 16-19
+
+TNTtemp.csv
+## tree core temperature on Feb 16-19
+
+programs are:
+TNTvec.py
+## generate temperature at the surface of the tree (outer boundary condition)
+
+csvReader.py
+## reads in information from data sets TNTweather.csv and TNTtemp.csv
+
+source.py
+## generates solar, blackbody, and convect resources, then output the sum as source
+
+testHeat.py
+## modification of heatMain to test modification of code and variation of parameters; DO NOT ADD or COMMIT
+
+heatMain.py
+## main code to run code
+
+voltage.py
+## generate voltage from heatMain.py
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Experiments:
+
+%%%%%%%10/5
+testHeat.py and heatMain.py returns different results, due to different boundary condition;
+
+# testHeat is closer to true 
+# measured value
+run testHeat
+c = temp(config)
+max difference throughout the day: core and bark at [1, -2] = 0.9285670766063845
+    
+# tree bark with Dirichlet condition for temperature
+def g1(t):
+    return tntv.bdryArray[t]
+
+# source term at tree bark
+def gs(t):
+    
+    return stree.sourceTerm[t]
+
+###########
+
+# heatMain is further away from
+# tru value
+run heatMain
+c = temp(config)
+max difference throughout the day: core and bark at [1, -2] = 2.451585913093993
+
+## tree bark with Dirichlet condition for temperature
+def g1(t):
+#    return tntv.bdryArray[t]
+    return stree.barkTemp[t]
+# source term at tree bark
+def gs(t):
+    return stree.sourceTerm[t]
+
+If change boundary condition in heatMain, result is now consistent with that of testHeat.py
+
+%%%%%%%%%%%%%% check if heatMain.py is consistent with heat1dCNpolar.py
+
+Using identical parameters in testHeat.py (temp version of heatMain.py) and heat1dCNpolar.py yields the same result (same as conference paper).
+parameters: 
+
+config['gridPoints'] = 50
+config['timeSteps'] = 1000
+#mu,sigma = 1, 0.001 # mean and standard deviation
+config['thermalConductivity'] = 0.12*np.ones(6) # 0.12*np.random.normal(mu, sigma, 6)
+config['heatCapacity_rhoc'] = 1.7#510*1380
+config['at_point'] = 38
+
+source: 
+
+from sourceS import * # source term at bdry
+from Temp_dataVec import * # boundary at tree bark
+
+diameter of tree taken to be 1:
+
+r = np.linspace(0, 1, m, endpoint=False)
+
+Test on heat Capacity (density * specific heat)
+When the value is above 500, there is very little heat transfer on the interior of the tree. minimum is always initial condition (used at 286.483333333333)
+
+run testHeat
+for j in range(1,500,10):
+    config['heatCapacity_rhoc'] = j
+    print("heatCapacity_rhoc is", j)
+    c = temp(config)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Experiments with TNTvec.py
+
+Use actual experimental Ta or estimate of Ta by ambient temperature.
+Goal: compare generated Tb with experimental Tb (bark temperature) to conclude that our estimate is accurate even if the only information available is ambient data (no need to drill holes)
+
+%%%%%%%%%%%%
+h and Tb from experimental values:
+
+hArray:
+
+array([13.62683331, 13.59911793, 13.57136759, 13.54358213, 13.51576139,
+       ...
+       12.6222532 , 12.56408915, 12.50575819, 12.44725856, 12.3885885 ])
+
+#######
+bdryArray
+
+array([300.2290707 , 300.22946738, 300.2298653 , 300.22983099,
+       ...
+       300.61724561, 300.61671656, 300.61641437, 300.6161104 ])
+
+##################
+h and Tb from estimate values:
+
+hArray
+
+array([13.62683331, 13.59911793, 13.57136759, 13.54358213, 13.51576139,
+       ...
+       12.6222532 , 12.56408915, 12.50575819, 12.44725856, 12.3885885 ])
+
+bdryArray
+
+array([300.11618848, 300.11613783, 300.11608697, 300.1160359 ,
+       ...
+       300.11413147, 300.1140113 , 300.11388997, 300.11376746])
+
+%%%%%%%%%%%%
+
+## last two portions to generate bdryArrayEx and bdryArrayEs:
+
+#%% weather data collected
+windSpeed = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.windspeed16np.size),cR.windspeed16np)
+albedo = .3  # "For albedo, we assumed a value of 0.3" - Potter Anderson page 3
+radiation = (1 - albedo) * np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.solar16np.size), cR.solar16np)
+
+hVec = []
+bdry = []
+
+#%% Tb generated with experimental data
+barkTemp = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.barkTemp16np.size),cR.barkTemp16np)
+coreTemp = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.coreTemp16np.size),cR.coreTemp16np)
+diffTemp = barkTemp - coreTemp
+
+for j in range(1000):
+    param = {"Ta": coreTemp[j], "Va": windSpeed[j], "qrads": radiation[j], "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.12,
+         "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.18,
+         "L": 10, "DeltaT": diffTemp[j], "DeltaR": 100/1000, "timeSteps": 1000}
+    h, Tb = chtbt()
+    hVec.append(h)
+    bdry.append(Tb)
+    
+hArrayEx = np.asarray(hVec)
+bdryArrayEx = np.asarray(bdry)
+
+print("h and Tb from experimental data")
+
+#%% Tb generated with estimate data (no measurements of tree temp)
+#tempAir = np.interp(np.linspace(0,24,1000), np.linspace(0,24,cR.temp16np.size),cR.temp16np)
+#deltaT = np.average(diffTemp)
+#
+#for j in range(1000):
+#    param = {"Ta": tempAir[j], "Va": windSpeed[j], "qrads": radiation[j], "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.12,
+#         "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.18,
+#         "L": 10, "DeltaT": deltaT, "DeltaR": 100/1000, "timeSteps": 1000}
+#    h, Tb = chtbt()
+#    hVec.append(h)
+#    bdry.append(Tb)
+#    
+#hArrayEs = np.asarray(hVec)
+#bdryArrayEs = np.asarray(bdry)
+#print("h and Tb from estimate data")
+
+error2 = bdryArrayEx - bdryArrayEs
+
+error2.max()
+Out[18]: 6.229719596800976
+
+error2.min()
+Out[19]: -2.673096198815358
+
+for j in range(1000):
+    if error2[j]>0.5:
+        print(j, error2[j])
+
+hArrayEx.size
+Out[20]: 1000
+
+hArrayEs.size
+Out[21]: 1000
+
+barkTemp.size
+Out[22]: 1000
+
+errEsbark = np.abs(bdryArrayEs - barkTemp)
+
+errExbark = np.abs(bdryArrayEx - barkTemp)
+
+np.max(errEsbark)
+Out[34]: 16.19946652275513
+
+np.max(errExbark)
+Out[35]: 9.969746925954155
+
+temp1 = []
+
+for j in range(1000):
+    if errEsbark[j]>3:
+        print(j, errEsbark[j])
+        temp1.append(errEsbark[j])
+
+temp2 = []
+
+for j in range(1000):
+    if errExbark[j]>3:
+        print(j, errExbark[j])
+        temp2.append(errExbark[j])
+
+len(temp1) = 308
+len(temp2) = 74
+
+indexMaxEsbark = np.argmax(errEsbark) 
+
+indexMaxEsbark
+Out[55]: 347
+
+indexMaxExbark = np.argmax(errExbark)
+
+indexMaxExbark
+Out[57]: 347
+
+errEsbark[347]
+Out[58]: 16.19946652275513
+
+errExbark[347]
+Out[59]: 9.969746925954155
+
+Bark temperature generated by experimental data vs measured bark temperature data in figure: tempDiffExBark.eps
+
+Bark temperature generated by estimated data vs measured bark temperature data in figure: tempDiffEsBark.eps
+
+%%%%%%%%% estimated/generated bark temperature is bad around 7-th hour, so will try to use the following parameters (change in qrads):
+
+for j in range(1000):
+    param = {"Ta": tempAir[j], "Va": windSpeed[j], "qrads": 650, "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.12,
+         "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.18,
+         "L": 10, "DeltaT": deltaT, "DeltaR": 100/1000, "timeSteps": 1000}
+    h, Tb = chtbt()
+    hVec.append(h)
+    bdry.append(Tb)
+
+%% problem not fixed; estimated temperature lower than before. Use parameters from before see if it helps
+
+param = {"Ta": coreTemp[j], "Va": windSpeed[j], "qrads": 650, "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.11, "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.2, "L": 10, "DeltaT": 2, "DeltaR": 100 / 1000, "timeSteps": 1000}
+
+result is even worse
+
+## change bdry condition in heatMain to measured bark temp, grid resolution analysis goes up to around 2.4 at 340 grid points, then comes down
+
+## tree bark with Dirichlet condition for temperature
+def g1(t):
+#    return tntv.bdryArray[t]
+    return stree.barkTemp[t]
+
+import heatMain as heat
+
+config = heat.config
+
+for j in range(0, 600, 20):
+    config['gridPoints'] = 20 + j
+    print(config['gridPoints'])
+    g = heat.temp(config)
+
+But inconsistent to data in TNTtemp.csv
+
+TNTiterationVec.py compares data with Protasio data and result is good. So try with TNTtemp data
+
+TNTiterationVec.py depends on Tbinit- very small differences.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Experiments with heatMain.py
+
+Plot temperature + current of four days to provide long term energy reference
+
+Plot figs of stacked ambient temperature vs. temperature difference (expect to see some lags)
+
+run grid resolution analysis with heat1dK.py
+experiment with resources with TNTvec.py
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+LaTeX: grid resolution analysis-> talk about convergence
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+csvReader.py generated figures:
+
+coreFig, barkFig, radiationFig, windFig, ambTempFig
+
+last entry of list is correct
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Grid resolution analysis: added heatGrid.py to test grid resolution analysis with a simple code from LeVeque. Temp difference increases monotonically. 
+
+from heatGrid import *
+
+for j in range(50,500,50):
+    gridNum(j)
+
+--if the temperature difference only vary after two decimal points, it is within precision (from Heather)
+
+
