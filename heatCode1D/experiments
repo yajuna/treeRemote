@@ -29,6 +29,11 @@ voltage.py
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Experiments:
 
+%%%%%%% 10/31 try two things:
+1. get rid of all source term except solar radiation
+2. Consider using Dirichlet bdry condition at the tree center too
+3. revisit TNTvec with new parameters to be consistent with documentation from Heather
+
 %%%%%%%10/5
 testHeat.py and heatMain.py returns different results, due to different boundary condition;
 
