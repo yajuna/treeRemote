@@ -125,7 +125,7 @@ diffTemp = barkTemp - coreTemp
 for j in range(1000):
     param = {"Ta": coreTemp[j], "Va": windSpeed[j], "qrads": radiation[j], "Pr": 0.707, "Ka": 26.3e-3, "Kt": 0.12,
          "nu": 15.89e-6, "epsilon": 0.8, "sigma": 5.67e-8, "C": 0.193, "m": 0.618, "rb": 0.18,
-         "L": 10, "DeltaT": diffTemp[j], "DeltaR": 100/1000}#, "timeSteps": 1000}
+         "L": -35, "DeltaT": diffTemp[j], "DeltaR": 100/1000}#, "timeSteps": 1000}
     h, Tb = chtbt()
     hVec.append(h)
     bdry.append(Tb)
@@ -150,7 +150,7 @@ plt.title('Generated Bark Temperature vs Measured Bark Temperature')
 plt.axis([0,24,290,315])
 plt.xlabel('Time (hrs)')
 plt.ylabel('Temperature (K)')
-plt.savefig('/home/yajun/Documents/treePower/TNT/TNTfig/' + 'PostempDiff' + 'ExBark' + '.eps', format='eps', dpi=300,bbox_inches='tight')
+plt.savefig('/home/yajun/Documents/treePower/TNT/TNTfig/' + 'NegSourceTempDiffL=2' + 'ExBark' + '.eps', format='eps', dpi=300,bbox_inches='tight')
 plt.show()    
     
 

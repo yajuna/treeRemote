@@ -34,6 +34,23 @@ Experiments:
 2. Consider using Dirichlet bdry condition at the tree center too
 3. revisit TNTvec with new parameters to be consistent with documentation from Heather
 
+run testHeat
+
+TNTvec with L = 10 is better than L = 3.26
+
+When taking L = -35, the figure looks a lot better- it is possible the term has wrong sign, or should ignore one term 
+
+run with testHeat: in source.py, only count solar in sourceTerm; L =10, figure called "solarTempDiffL=10ExBark.eps"
+
+run with testHeat: in source.py, only count negative solar in sourceTerm; L =10, figure called "NegSolarTempDiffL=10ExBark.eps"
+
+run with testHeat: in souce.py, make all sources negative, take L = 35, figure called "NegSourceTempDiffL=35ExBark.eps"
+
+run with testHeat: in souce.py, make all sources positive, take L = 35, figure called "PosSourceTempDiffL=35ExBark.eps"
+
+run with testHeat: to see how the sign of source impact the result, will take a small value of L=2 (L=1 gives zero in the denominator), and run to generate figures "PosSourceL=2ExBark.eps" and "NegSourceL=2ExBark.eps"
+-Seems like the sign does not matter
+
 %%%%%%%10/5
 testHeat.py and heatMain.py returns different results, due to different boundary condition;
 

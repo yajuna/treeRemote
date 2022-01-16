@@ -109,7 +109,7 @@ def temp(config):
         soln.append(U0)
 
 # %% print solutions
-#    print(soln)
+    print("number of time steps, or length of solution list", len(soln))
     soln_plot = np.asarray(soln)
     print("max and min of soln_plot", soln_plot.max(), soln_plot.min())
     soln_diff = soln_plot[:,point_pair[0]]-soln_plot[:,point_pair[1]]

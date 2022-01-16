@@ -30,7 +30,7 @@ convect = tntv.hArray * (tntv.bdryArray - tempAir) # Tsfc - Tair
 sourceTerm = solar + blackbody + convect
 
 ## Change source term to negative
-#sourceTerm = - sourceTerm
+sourceTerm = - sourceTerm
 
 ## 
 
